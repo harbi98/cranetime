@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="13" height="12" viewBox="0 0 13 12">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #e4ecf3;
+        stroke: #f60;
+        stroke-linejoin: round;
+        stroke-width: 2px;
+        filter: url(#filter);
+      }
+    </style>
+    <filter id="filter" x="1" y="1" width="11" height="10" filterUnits="userSpaceOnUse">
+      <feFlood result="flood" flood-color="#f9fbfd"/>
+      <feComposite result="composite" operator="in" in2="SourceGraphic"/>
+      <feBlend result="blend" in2="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g style="fill: #e4ecf3; filter: url(#filter)">
+    <rect id="Rounded_Rectangle_1472" data-name="Rounded Rectangle 1472" class="cls-1" x="1" y="1" width="11" height="10" rx="3" ry="3" style="stroke: inherit; filter: none; fill: inherit"/>
+  </g>
+  <use xlink:href="#Rounded_Rectangle_1472" style="stroke: #f60; filter: none; fill: none"/>
+</svg>
