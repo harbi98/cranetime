@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
             'type' => 'admin',
-            'password' => base64_encode('12345678')
+            'password' => bcrypt('12345678')
         ]);
     }
 }
