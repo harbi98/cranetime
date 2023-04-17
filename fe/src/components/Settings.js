@@ -62,7 +62,7 @@ function Settings() {
           <Box className="settings-nav-body">
             <List
               sx={{
-                marginBottom: '30px',
+                marginBottom: '20px',
                 '& .MuiListItemButton-root:hover': {
                   '&, & .MuiListItemText-root': {
                     color: '#0f72bd',
@@ -71,10 +71,10 @@ function Settings() {
               }}
               disablePadding
             >
-              <Typography className="settings-nav-name">System</Typography>
+              <Typography className="settings-nav-name" sx={{fontWeight: '300', fontSize: 14}}>System</Typography>
               {['Site', 'Modules'].map((text, index) => (
                 <ListItem key={text} disablePadding>
-                  <ListItemButton onClick={() => settings_display(text)}>
+                  <ListItemButton onClick={() => settings_display(text)} sx={{padding: '5px 0px'}}>
                     <ListItemText primary={text} sx={{color: 'white'}} />
                   </ListItemButton>
                 </ListItem>
@@ -83,7 +83,7 @@ function Settings() {
             <Divider />
             <List
               sx={{
-                marginBottom: '30px',
+                marginBottom: '20px',
                 '& .MuiListItemButton-root:hover': {
                   '&, & .MuiListItemText-root': {
                     color: '#0f72bd',
@@ -92,10 +92,10 @@ function Settings() {
               }}
               disablePadding
             >
-              <Typography className="settings-nav-name">People & Co.</Typography>
+              <Typography className="settings-nav-name" sx={{fontWeight: '300', fontSize: 14}}>People & Co.</Typography>
               {['People', 'Companies'].map((text, index) => (
                 <ListItem key={text} disablePadding>
-                  <ListItemButton onClick={() => settings_display(text)}>
+                  <ListItemButton onClick={() => settings_display(text)} sx={{padding: '5px 0px'}}>
                     <ListItemText primary={text} sx={{color: 'white'}}/>
                   </ListItemButton>
                 </ListItem>
@@ -104,7 +104,7 @@ function Settings() {
             <Divider />
             <List
               sx={{
-                marginBottom: '30px',
+                marginBottom: '20px',
                 '& .MuiListItemButton-root:hover': {
                   '&, & .MuiListItemText-root': {
                     color: '#0f72bd',
@@ -113,10 +113,10 @@ function Settings() {
               }}
               disablePadding
             >
-              <Typography className="settings-nav-name">Project</Typography>
+              <Typography className="settings-nav-name" sx={{fontWeight: '300', fontSize: 14}}>Project</Typography>
               {['Task', 'Milestones'].map((text, index) => (
                 <ListItem key={text} disablePadding>
-                  <ListItemButton onClick={() => settings_display(text)}>
+                  <ListItemButton onClick={() => settings_display(text)} sx={{padding: '5px 0px'}}>
                     <ListItemText primary={text} sx={{color: 'white'}}/>
                   </ListItemButton>
                 </ListItem>
@@ -125,7 +125,7 @@ function Settings() {
             <Divider />
             <List
               sx={{
-                marginBottom: '30px',
+                marginBottom: '20px',
                 '& .MuiListItemButton-root:hover': {
                   '&, & .MuiListItemText-root': {
                     color: '#0f72bd',
@@ -134,10 +134,10 @@ function Settings() {
               }}
               disablePadding
             >
-              <Typography className="settings-nav-name">Assets</Typography>
+              <Typography className="settings-nav-name" sx={{fontWeight: '300', fontSize: 14}}>Assets</Typography>
               {['Tower Cranes', 'Mobile Cranes', 'Building Hoists', 'Delivery Bays', 'Loading Platforms', 'Material Handling', 'Concrete Pumps'].map((text, index) => (
                 <ListItem key={text} disablePadding>
-                  <ListItemButton onClick={() => settings_display(text)}>
+                  <ListItemButton onClick={() => settings_display(text)} sx={{padding: '5px 0px'}}>
                     <ListItemText primary={text} sx={{color: 'white'}}/>
                   </ListItemButton>
                 </ListItem>
