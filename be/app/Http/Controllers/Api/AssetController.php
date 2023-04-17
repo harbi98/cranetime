@@ -9,8 +9,9 @@ use Illuminate\Support\Facades\Validator;
 
 class AssetController extends Controller
 {
-    public function index(){
-        $assets = Asset::all();
+    public function index($type){
+        //$assets = Asset::all();
+        $assets = Asset::where('type', '=', $type)->get();
         if($assets->count() > 0) {
             return response()->json([
                     'status' => 200,
@@ -26,8 +27,10 @@ class AssetController extends Controller
     public function store(Request $request) {
         $validator = Validator::make($request->all(), [
             'custom_name' => 'required',
-            'make' => 'required',
-            'model' => 'required',
+            //'make' => 'required',
+            //'model' => 'required',
+            'type' => 'required',
+            //'equipment_type' => 'required',
         ]);
 
         if($validator->fails()) {
@@ -37,9 +40,13 @@ class AssetController extends Controller
             ], 422);
         } else {
             $asset = Asset::create([
+                'type' => $request->type,
                 'custom_name' => $request->custom_name,
                 'make' => $request->make,
                 'model' => $request->model,
+                'max_length' => $request->max_length,
+                'unit' => $request->unit,
+                'equipment_type' => $request->equipment_type,
             ]);
             if($asset) {
                 return response()->json([
@@ -68,11 +75,9 @@ class AssetController extends Controller
             ], 404);
         }
     }
-    public function update(Request $request, int $id) {
+    public function updateName(Request $request, int $id) {
         $validator = Validator::make($request->all(), [
             'custom_name' => 'required',
-            'make' => 'required',
-            'model' => 'required',
         ]);
 
         if($validator->fails()) {
@@ -85,8 +90,6 @@ class AssetController extends Controller
             if($asset) {
                 $asset->update([
                     'custom_name' => $request->custom_name,
-                    'make' => $request->make,
-                    'model' => $request->model,
                 ]);
                 return response()->json([
                     'status' => 200,

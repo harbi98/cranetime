@@ -3,6 +3,7 @@ import '../App.min.css';
 import { Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, Link } from '@mui/material';
 import MailIcon from '@mui/icons-material/Mail';
 import SettingsIcon from '@mui/icons-material/Settings';
+import UserIcon from '@mui/icons-material/AccountCircle';
 import UnknownIcon from '@mui/icons-material/QuestionMark';
 import Settings from './Settings';
 import Chat from './Chat';
@@ -10,11 +11,20 @@ import Chat from './Chat';
 function Home() {
   const [home_main, set_home_main] = useState(<Settings/>);
   const drawerWidth = 75;
-  const icon_func = (index) => {
+  const icon_top = (index) => {
     if(index === 0) {
         return <MailIcon sx={{color: 'white'}}/>;
     } else {
         return <UnknownIcon sx={{color: 'white'}}/>;
+    }
+  }
+  const icon_bottom = (index) => {
+    if(index === 0) {
+      return <UserIcon sx={{color: 'white'}}/>;
+    } else if (index === 1) {
+        return <SettingsIcon sx={{color: 'white'}}/>;
+    } else {
+      return <UnknownIcon sx={{color: 'white'}}/>;
     }
   }
   const home_display = (home_dis) => {
@@ -59,7 +69,7 @@ function Home() {
               <ListItem key={text} disablePadding>
                 <ListItemButton sx={{height: 70, borderBottom: '1px solid #0161aa',}} onClick={() => home_display(text)}>
                   <ListItemIcon sx={{paddingLeft: '10px'}}>
-                    {icon_func(index)}
+                    {icon_top(index)}
                   </ListItemIcon>
                 </ListItemButton>
               </ListItem>
@@ -68,11 +78,11 @@ function Home() {
         </Box>
         <Box className="navbar-bottom">
           <List disablePadding>
-              {['Settings'].map((text, index) => (
+              {['User','Settings'].map((text, index) => (
                 <ListItem key={text} disablePadding>
                   <ListItemButton sx={{height: 70, borderTop: '1px solid #0161aa',}} onClick={() => home_display(text)}>
                     <ListItemIcon sx={{paddingLeft: '10px'}}>
-                      <SettingsIcon sx={{color: 'white'}}/>
+                      {icon_bottom(index)}
                     </ListItemIcon>
                   </ListItemButton>
                 </ListItem>

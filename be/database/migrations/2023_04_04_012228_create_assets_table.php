@@ -19,6 +19,8 @@ return new class extends Migration
             $table->string('custom_name', 255)->nullable();
             $table->string('make', 255)->nullable();
             $table->string('model', 255)->nullable();
+            $table->string('max_length', 255)->nullable();
+            $table->string('unit', 255)->nullable();
             $table->string('equipment_type', 255)->nullable();
             $table->timestamps();
         });

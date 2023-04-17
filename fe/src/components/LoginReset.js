@@ -64,7 +64,7 @@ function Login() {
       <Box className="login-main">
         <Box className="login-inner">
           <Box className="login-center">
-            <Typography class="login__title text__big">Reset your password</Typography>
+            <Typography className="login__title text__big">Reset your password</Typography>
             <Box className="login-feilds">
               <Box className="form-row">
                 <Typography className="text__small">Email Address</Typography>

@@ -45,11 +45,6 @@ html, body, #root {
   width: 100%;
   display: flex;
 }
-@media screen and (max-width: 991px) {
-  .container {
-    flex-direction: column;
-  }
-}
 .text__center {
   text-align: center
 }
@@ -123,11 +118,6 @@ html, body, #root {
   font-size: 2.875rem;
   line-height: 1
 }
-@media screen and (max-width:1440px) {
-  .text__timer {
-    font-size: 1.5rem
-  }
-}
 .btn_blue {
   color: var(--font-color-lightest);
   background-color: var(--blue-color);
@@ -146,32 +136,6 @@ html, body, #root {
   padding: 20px 20px 40px;
   background: url(./images/login_sidebar_bg.jpg) no-repeat center/cover;
 }
-@media screen and (max-width:1200px) {
-  .login-sidebar {
-      width: 400px;
-  }
-}
-
-@media screen and (max-width:991px) {
-  .login-sidebar {
-      width: auto;
-  }
-}
-.login-main {
-  position: relative;
-  width: calc(100% - 600px);
-}
-@media screen and (max-width:1200px) {
-  .login-main {
-      width: calc(100% - 400px)
-  }
-}
-@media screen and (max-width:991px) {
-  .login-main {
-      flex: 1 0 auto;
-      width: 100%
-  }
-}
 .login-error {
   display: none;
   position: absolute;
@@ -184,11 +148,6 @@ html, body, #root {
   color: var(--font-color-lightest);
   font-size: 1.125rem;
   line-height: 24px
-}
-@media screen and (max-width:991px) {
-  .login__error {
-      position: static
-  }
 }
 .login-sidebar-logo {
   display: flex;
@@ -207,40 +166,12 @@ html, body, #root {
   margin: 60px 0;
   padding: 0 40px;
 }
-@media screen and (max-width:1200px) {
-  .login-sidebar-info {
-      padding: 0 20px
-  }
-}
-@media screen and (max-width:991px) {
-  .login-sidebar-info {
-      text-align: center;
-      padding: 0
-  }
-}
 .login-sidebar-title {
   color: white;
   font-weight: 700;
   font-size: 3.625rem;
   line-height: 1;
   font-family: "Nunito Sans", sans-serif;
-}
-@media screen and (max-width:1200px) {
-  .login-sidebar-title {
-      font-size: 2.125rem
-  }
-}
-
-@media screen and (max-width:991px) {
-  .login-sidebar-title {
-      font-size: 3.625rem
-  }
-}
-
-@media screen and (max-width:767px) {
-  .login-sidebar-title {
-      font-size: 2.125rem
-  }
 }
 .login-sidebar-bottom {
   display: flex;
@@ -338,13 +269,6 @@ html, body, #root {
   left: 0;
   width: 100%;
   text-align: center;
-}
-@media screen and (max-width:991px) {
-  .login-footer {
-      position: static;
-      padding: 0;
-      margin-top: 60px
-  }
 }
 .navbar-header {
   padding: 10px;

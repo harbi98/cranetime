@@ -1,8 +1,9 @@
-import * as React from 'react';
+import React, { useState, useContext } from 'react';
 import '../App.min.css';
-
 import { styled } from '@mui/material/styles';
 import { Box, Typography, TextField, Button, Link } from '@mui/material';
+import { AuthContext } from '../context/AuthContext';
+
 
 const LoginButton = styled(Button)({
   borderRadius: 3,
@@ -43,6 +44,8 @@ const LoginButton = styled(Button)({
   },
 });
 
+
+
 function Error() {
   const condition = false;
   if(condition === true){
@@ -56,6 +59,11 @@ function Error() {
   }
 }
 function Login() {
+  const {loginUser} = useContext(AuthContext);
+  
+  const [email, setEmail] = useState();
+  const [password, setPassword] = useState();
+
   return (
     <Box className="container">
       <Box className="login-sidebar">
@@ -78,14 +86,14 @@ function Login() {
         <Error/>
         <Box className="login-inner">
           <Box className="login-center">
-            <Typography class="login__title text__big">Sign in to Cranetime</Typography>
+            <Typography className="login__title text__big">Sign in to Cranetime</Typography>
             <Box className="login-feilds">
               <Box className="form-row">
                 <Typography className="text__small">Email Address</Typography>
                 <Box className="form-group">
                   <Box className="form-cell">
                     <Box className="form__field">
-                      <TextField type="email" name="login_email" className="input"/>
+                      <TextField type="email" name="login_email" onChange={(e) => setEmail(e.target.value)} className="input"/>
                     </Box>
                   </Box>
                 </Box>
@@ -98,14 +106,14 @@ function Login() {
                 <Box className="form-group">
                   <Box className="form-cell">
                     <Box className="form__field">
-                      <TextField type="password" name="password" className="input"/>
+                      <TextField type="password" name="password" onChange={(e) => setPassword(e.target.value)} className="input"/>
                     </Box>
                   </Box>
                 </Box>
               </Box>
             </Box>
             <Box className="login__buttons">
-                <LoginButton variant='contained' href='/home'>Sign In</LoginButton>
+                <LoginButton variant='contained' onClick={() => loginUser(email, password)}>Sign In</LoginButton>
             </Box>
           </Box>
           <Box className="login-footer">

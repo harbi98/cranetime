@@ -1,8 +1,14 @@
 import { useState } from 'react';
 import '../App.min.css';
 import { Box, Drawer, List, ListItem, ListItemButton, Divider, ListItemText, Typography } from '@mui/material';
-import Site from './SettingsSite';
-import TowerCranes from './SettingsTowerCrane';
+import Site from './System/Site';
+import TowerCranes from './Assets/TowerCrane';
+import MobileCranes from './Assets/MobileCrane';
+import DeliveryBays from './Assets/DeliveryBays';
+import LoadingPlatforms from './Assets/LoadingPlatforms';
+import BuildingHoists from './Assets/BuildingHoist';
+import MaterialHandling from './Assets/MaterialHandling';
+import ConcretePumps from './Assets/ConcretePumps';
 
 function Settings() {
   const drawerWidth = 250;
@@ -12,6 +18,18 @@ function Settings() {
       set_settings_main(<Site/>);
     } else if(settings_dis === "Tower Cranes") {
       set_settings_main(<TowerCranes/>);
+    } else if(settings_dis === "Mobile Cranes") {
+      set_settings_main(<MobileCranes/>);
+    } else if(settings_dis === "Delivery Bays") {
+      set_settings_main(<DeliveryBays/>);
+    } else if(settings_dis === "Loading Platforms") {
+      set_settings_main(<LoadingPlatforms/>);
+    } else if(settings_dis === "Building Hoists") {
+      set_settings_main(<BuildingHoists/>);
+    } else if(settings_dis === "Material Handling") {
+      set_settings_main(<MaterialHandling/>);
+    } else if(settings_dis === "Concrete Pumps") {
+      set_settings_main(<ConcretePumps/>);
     } else {
       set_settings_main(null);
     }
@@ -117,11 +135,10 @@ function Settings() {
               disablePadding
             >
               <Typography className="settings-nav-name">Assets</Typography>
-              {['Tower Cranes', 'Mobile Cranes', 'Hoists', 'Delivery Bays', 'Loading Platforms', 'Material Handling', 'Concrete Pumps'].map((text, index) => (
+              {['Tower Cranes', 'Mobile Cranes', 'Building Hoists', 'Delivery Bays', 'Loading Platforms', 'Material Handling', 'Concrete Pumps'].map((text, index) => (
                 <ListItem key={text} disablePadding>
                   <ListItemButton onClick={() => settings_display(text)}>
-                    <ListItemText primary={text} sx={{color: 'white'}}
-                    />
+                    <ListItemText primary={text} sx={{color: 'white'}}/>
                   </ListItemButton>
                 </ListItem>
               ))}

@@ -12,8 +12,12 @@ class Asset extends Model
     protected $table = 'assets';
 
     protected $fillable = [
+        'type',
         'custom_name',
         'make',
-        'model'
+        'model',
+        'max_length',
+        'unit',
+        'equipment_type',
     ];
 }
