@@ -149,6 +149,14 @@ function TowerCrane() {
   const handleOpenSetName = () => setOpenSetName(true);
   const handleCloseSetName = () => setOpenSetName(false);
 
+  const [openSetType, setOpenSetType] = useState(false);
+  const handleOpenSetType = () => setOpenSetType(true);
+  const handleCloseSetType = () => setOpenSetType(false);
+
+  const [openSetMakeModel, setOpenSetMakeModel] = useState(false);
+  const handleOpenSetMakeModel = () => setOpenSetMakeModel(true);
+  const handleCloseSetMakeModel = () => setOpenSetMakeModel(false);
+
   const showAssets = () => {
     const headers = {
       'Content-Type': 'application/json',
@@ -176,11 +184,19 @@ function TowerCrane() {
       })
       .then((res) => {
         setAssetID(res.data.data.id);
+
         setAssetName(res.data.data.custom_name);
         setCustomName(res.data.data.custom_name);
+
         setAssetEquipmentType(res.data.data.equipment_type);
+        setEquipmentType(res.data.data.equipment_type);
+
         setAssetMake(res.data.data.make);
+        setMake(res.data.data.make);
+
         setAssetModel(res.data.data.model);
+        setModel(res.data.data.model);
+
         setAssetSupplier(res.data.data.supplier);
       })
     } catch(e) {
@@ -251,9 +267,54 @@ function TowerCrane() {
       console.log(e);
     }
   }
+  const editAssetType = () => {
+    const data = {
+      equipment_type: equipmentType,
+    };
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+    };
+    try {
+      axios.put('http://127.0.0.1:8000/api/asset/'+assetID+'/edit-type', data, {
+        headers: headers
+      })
+      .then((res) => {
+        console.log(res.data.message);
+        handleCloseSetType();
+        showAssets();
+        showAsset(assetID);
+      })
+    } catch(e) {
+      console.log(e);
+    }
+  }
+  const editAssetMakeModel = () => {
+    const data = {
+      make: make,
+      model: model
+    };
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+    };
+    try {
+      axios.put('http://127.0.0.1:8000/api/asset/'+assetID+'/edit-make-model', data, {
+        headers: headers
+      })
+      .then((res) => {
+        console.log(res.data.message);
+        handleCloseSetMakeModel();
+        showAssets();
+        showAsset(assetID);
+      })
+    } catch(e) {
+      console.log(e);
+    }
+  }
   useEffect(() => {
     showAssets();
-    showAsset_onLoad();
+    showAsset_onLoad(); // eslint-disable-next-line
   }, [])
 
   return (
@@ -353,7 +414,7 @@ function TowerCrane() {
                 <Typography sx={{fontSize: 24, color: '#808080'}}>{assetEquipmentType}</Typography>
               </Box>
               <Box sx={{ display: 'flex', width: '100px', borderLeft: 2, borderColor: '#edf2f6', alignItems: 'center', justifyContent: 'center'}}>
-                <IconButton>
+                <IconButton onClick={() => {handleOpenSetType()}}>
                   <EditIcon sx={{color: '#808080'}}/>
                 </IconButton>
               </Box>
@@ -361,10 +422,10 @@ function TowerCrane() {
             <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between', borderBottom: 2, borderColor: '#edf2f6', padding: '20px' }}>
               <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', justifyContent: 'center', padding: '10px 20px'}}>
                 <Typography sx={{fontSize: 18, color: '#808080', fontWeight: '300'}}>Make & Model</Typography>
-                <Typography sx={{fontSize: 24, color: '#808080'}}>{assetMake || assetModel ? assetMake + ' - ' + assetModel : 'N/A'}</Typography>
+                <Typography sx={{fontSize: 24, color: '#808080'}}>{assetMake ? assetMake : 'N/A'} - {assetModel ? assetModel : 'N/A'}</Typography>
               </Box>
               <Box sx={{ display: 'flex', width: '100px', borderLeft: 2, borderColor: '#edf2f6', alignItems: 'center', justifyContent: 'center'}}>
-                <IconButton>
+                <IconButton onClick={() => {handleOpenSetMakeModel()}}>
                   <EditIcon sx={{color: '#808080'}}/>
                 </IconButton>
               </Box>
@@ -452,6 +513,73 @@ function TowerCrane() {
                 </Box>
                 <Box sx={{marginTop: '10px'}}>
                   <CancelButton sx={{width: '360px', height: '75px'}} onClick={() => handleCloseSetName()}>Cancel</CancelButton>
+                </Box>
+              </Box>
+          </Box>
+        </Box>
+      </Modal>
+      <Modal
+        open={openSetType}
+      >
+        <Box sx={style}>
+          <Box borderBottom={2} borderColor='#e0e0e0' sx={{display: 'flex', width: '100%', height: '75px', justifyContent: 'flex-end', padding: '10px'}}>
+            <IconButton onClick={() => handleCloseSetType()}>
+              <CloseIcon/>
+            </IconButton>
+          </Box>
+          <Box sx={{display: 'flex', margin: '50px 20px', alignItems: 'center', flexDirection: 'column'}}>
+              <Typography>Set Crane Type</Typography>
+              <Box>
+                <Typography>Type</Typography>
+                <Autocomplete
+                  disablePortal
+                  value={equipmentType}
+                  onChange={(event, newValue) => {setEquipmentType(newValue)}}
+                  //inputValue={inputValue}
+                  id="controllable-states-demo"
+                  options={options}
+                  sx={{ width: '360px' }}
+                  renderInput={(params) => <TextField {...params} placeholder='Select...'/>}
+                />
+              </Box>
+              <Box sx={{display: 'flex', marginTop: '50px', flexDirection: 'column'}}>
+                <Box sx={{marginTop: '10px'}}>
+                  <AddButton sx={{width: '360px', height: '75px'}} onClick={() => editAssetType()}>Update</AddButton>
+                </Box>
+                <Box sx={{marginTop: '10px'}}>
+                  <CancelButton sx={{width: '360px', height: '75px'}} onClick={() => handleCloseSetType()}>Cancel</CancelButton>
+                </Box>
+              </Box>
+          </Box>
+        </Box>
+      </Modal>
+      <Modal
+        open={openSetMakeModel}
+      >
+        <Box sx={style}>
+          <Box borderBottom={2} borderColor='#e0e0e0' sx={{display: 'flex', width: '100%', height: '75px', justifyContent: 'flex-end', padding: '10px'}}>
+            <IconButton onClick={() => handleCloseSetMakeModel()}>
+              <CloseIcon/>
+            </IconButton>
+          </Box>
+          <Box sx={{display: 'flex', margin: '50px 20px', alignItems: 'center', flexDirection: 'column'}}>
+              <Typography>Set Make & Model</Typography>
+              <Box>
+                <Box>
+                  <Typography>Crane Manufacturer</Typography>
+                  <TextField sx={{width: '360px'}} value={make} onChange={(e) => setMake(e.target.value)}/>
+                </Box>
+                <Box>
+                  <Typography>Model</Typography>
+                  <TextField sx={{width: '360px'}} value={model} onChange={(e) => setModel(e.target.value)}/>
+                </Box>
+              </Box>
+              <Box sx={{display: 'flex', marginTop: '50px', flexDirection: 'column'}}>
+                <Box sx={{marginTop: '10px'}}>
+                  <AddButton sx={{width: '360px', height: '75px'}} onClick={() => editAssetMakeModel()}>Update</AddButton>
+                </Box>
+                <Box sx={{marginTop: '10px'}}>
+                  <CancelButton sx={{width: '360px', height: '75px'}} onClick={() => handleCloseSetMakeModel()}>Cancel</CancelButton>
                 </Box>
               </Box>
           </Box>

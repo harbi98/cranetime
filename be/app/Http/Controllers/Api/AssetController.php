@@ -103,6 +103,64 @@ class AssetController extends Controller
             }
         }
     }
+    public function updateType(Request $request, int $id) {
+        $validator = Validator::make($request->all(), [
+            'equipment_type' => 'required',
+        ]);
+
+        if($validator->fails()) {
+            return response()->json([
+                'status' => 422,
+                'message' => $validator->messages()
+            ], 422);
+        } else {
+            $asset = Asset::find($id);
+            if($asset) {
+                $asset->update([
+                    'equipment_type' => $request->equipment_type,
+                ]);
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'Asset Updated Succesfully'
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => 404,
+                    'message' => 'No Such Asset Found'
+                ], 404);
+            }
+        }
+    }
+    public function updateMakeModel(Request $request, int $id) {
+        $validator = Validator::make($request->all(), [
+            'make' => 'required',
+            'model' => 'required',
+        ]);
+
+        if($validator->fails()) {
+            return response()->json([
+                'status' => 422,
+                'message' => $validator->messages()
+            ], 422);
+        } else {
+            $asset = Asset::find($id);
+            if($asset) {
+                $asset->update([
+                    'make' => $request->make,
+                    'model' => $request->model,
+                ]);
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'Asset Updated Succesfully'
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => 404,
+                    'message' => 'No Such Asset Found'
+                ], 404);
+            }
+        }
+    }
     public function destroy($id) {
         $asset = Asset::find($id);
         if($asset) {

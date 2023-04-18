@@ -6,6 +6,7 @@ import { styled } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
 import ChevronRight from '@mui/icons-material/ChevronRight';
+import EditIcon from '@mui/icons-material/Edit';
 
 const AddButton = styled(Button)({
   borderRadius: 3,
@@ -123,11 +124,18 @@ const style = {
 function BuildingHoist() {
   const [craneAssets, setCraneAssets] = useState([]);
 
+  const [assetID, setAssetID] = useState();
+  const [assetName, setAssetName] = useState('');
+
   const [customName, setCustomName] = useState();
 
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  const [openSetName, setOpenSetName] = useState(false);
+  const handleOpenSetName = () => setOpenSetName(true);
+  const handleCloseSetName = () => setOpenSetName(false);
 
   const showAssets = () => {
     const headers = {
@@ -140,6 +148,41 @@ function BuildingHoist() {
       })
       .then((res) => {
         setCraneAssets(res.data.data);
+      })
+    } catch(e) {
+      console.log(e);
+    }
+  }
+  const showAsset = (id) => {
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+    };
+    try {
+      axios.get('http://127.0.0.1:8000/api/asset/'+id, {
+        headers: headers
+      })
+      .then((res) => {
+        setAssetID(res.data.data.id);
+        setAssetName(res.data.data.custom_name);
+        setCustomName(res.data.data.custom_name);
+      })
+    } catch(e) {
+      console.log(e);
+    }
+  }
+  const showAsset_onLoad = () => {
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+    };
+    try {
+      axios.get('http://127.0.0.1:8000/api/assets/concrete', {
+        headers: headers
+      })
+      .then((res) => {
+        setAssetID(res.data.data[0].id);
+        showAsset(res.data.data[0].id);
       })
     } catch(e) {
       console.log(e);
@@ -166,10 +209,32 @@ function BuildingHoist() {
     } catch(e) {
       console.log(e);
     }
-  };
-
+  }
+  const editAssetName = () => {
+    const data = {
+      custom_name: customName,
+    };
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+    };
+    try {
+      axios.put('http://127.0.0.1:8000/api/asset/'+assetID+'/edit-name', data, {
+        headers: headers
+      })
+      .then((res) => {
+        console.log(res.data.message);
+        handleCloseSetName();
+        showAssets();
+        showAsset(assetID);
+      })
+    } catch(e) {
+      console.log(e);
+    }
+  }
   useEffect(() => {
     showAssets();
+    showAsset_onLoad(); // eslint-disable-next-line
   }, [])
 
   return (
@@ -215,7 +280,7 @@ function BuildingHoist() {
               {
                 craneAssets.map((craneAssets) => (
                   <Box sx={{display: 'flex', minHeight: 100, borderBottom: 2, borderBottomColor: '#edf2f6'}} key={craneAssets['id']}>
-                    <ListButton>{craneAssets.custom_name}<ChevronRight/></ListButton>
+                    <ListButton onClick={() => showAsset(craneAssets['id'])}>{craneAssets.custom_name}<ChevronRight/></ListButton>
                   </Box>
                 ))
               }
@@ -251,6 +316,19 @@ function BuildingHoist() {
           >
             <Typography>Concrete Pump Info</Typography>
           </Box>
+          <Box sx={{display: 'flex', flexDirection: 'column', height: 'calc(100% - 75px)'}}>
+            <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between', borderBottom: 2, borderColor: '#edf2f6', padding: '20px' }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', justifyContent: 'center', padding: '10px 20px'}}>
+                <Typography sx={{fontSize: 18, color: '#808080', fontWeight: '300'}}>Name</Typography>
+                <Typography sx={{fontSize: 24, color: '#808080'}}>{assetName}</Typography>
+              </Box>
+              <Box sx={{ display: 'flex', width: '100px', borderLeft: 2, borderColor: '#edf2f6', alignItems: 'center', justifyContent: 'center'}}>
+                <IconButton onClick={() => handleOpenSetName()}>
+                  <EditIcon sx={{color: '#808080'}}/>
+                </IconButton>
+              </Box>
+            </Box>
+          </Box>
         </Box>
       </Box>
       <Modal
@@ -274,6 +352,32 @@ function BuildingHoist() {
                 </Box>
                 <Box sx={{marginTop: '10px'}}>
                   <CancelButton sx={{width: '360px', height: '75px'}} onClick={() => handleClose()}>Cancel</CancelButton>
+                </Box>
+              </Box>
+          </Box>
+        </Box>
+      </Modal>
+      <Modal
+        open={openSetName}
+      >
+        <Box sx={style}>
+          <Box borderBottom={2} borderColor='#e0e0e0' sx={{display: 'flex', width: '100%', height: '75px', justifyContent: 'flex-end', padding: '10px'}}>
+            <IconButton onClick={() => handleCloseSetName()}>
+              <CloseIcon/>
+            </IconButton>
+          </Box>
+          <Box sx={{display: 'flex', margin: '50px 20px', alignItems: 'center', flexDirection: 'column'}}>
+              <Typography>Set Mobile Crane Name</Typography>
+              <Box>
+                <Typography>Name</Typography>
+                <TextField sx={{width: '360px'}} value={customName} onChange={(e) => setCustomName(e.target.value)}/>
+              </Box>
+              <Box sx={{display: 'flex', marginTop: '50px', flexDirection: 'column'}}>
+                <Box sx={{marginTop: '10px'}}>
+                  <AddButton sx={{width: '360px', height: '75px'}} onClick={() => editAssetName()}>Update</AddButton>
+                </Box>
+                <Box sx={{marginTop: '10px'}}>
+                  <CancelButton sx={{width: '360px', height: '75px'}} onClick={() => handleCloseSetName()}>Cancel</CancelButton>
                 </Box>
               </Box>
           </Box>
