@@ -205,6 +205,7 @@ function BuildingHoist() {
         console.log(res.data.message);
         handleClose();
         showAssets();
+        showAsset_onLoad();
       })
     } catch(e) {
       console.log(e);

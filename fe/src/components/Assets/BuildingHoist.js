@@ -172,6 +172,35 @@ function BuildingHoist() {
       console.log(e);
     }
   }
+  const searchAsset = (custom_name) => {
+    setCraneAssets([]);
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+    };
+    if(custom_name !== "") {
+      try {
+        axios.get('http://127.0.0.1:8000/api/asset/search/hoist/'+custom_name, {
+          headers: headers
+        })
+        .then((res) => {
+          if(res.data.data.length > 0) {
+            setCraneAssets(res.data.data);
+            showAsset(res.data.data[0].id);
+          } else {
+            setAssetID('');
+            setAssetName('');
+            setCustomName('');
+          }
+        })
+      } catch(e) {
+        console.log(e);
+      }
+    } else {
+      showAssets();
+      showAsset_onLoad();
+    }
+  }
   const showAsset_onLoad = () => {
     const headers = {
       'Content-Type': 'application/json',
@@ -206,6 +235,7 @@ function BuildingHoist() {
         console.log(res.data.message);
         handleClose();
         showAssets();
+        showAsset_onLoad();
       })
     } catch(e) {
       console.log(e);
@@ -272,6 +302,7 @@ function BuildingHoist() {
                 <SearchIcon/>
               ),
             }}
+            onChange={(e) => searchAsset(e.target.value)}
             />
         </Box>
         <Box display="flex" sx={{
@@ -322,7 +353,7 @@ function BuildingHoist() {
             <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between', borderBottom: 2, borderColor: '#edf2f6', padding: '20px' }}>
               <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', justifyContent: 'center', padding: '10px 20px'}}>
                 <Typography sx={{fontSize: 18, color: '#808080', fontWeight: '300'}}>Name</Typography>
-                <Typography sx={{fontSize: 24, color: '#808080'}}>{assetName}</Typography>
+                <Typography sx={{fontSize: 24, color: '#808080'}}>{assetName ? assetName : 'N/A'}</Typography>
               </Box>
               <Box sx={{ display: 'flex', width: '100px', borderLeft: 2, borderColor: '#edf2f6', alignItems: 'center', justifyContent: 'center'}}>
                 <IconButton onClick={() => {handleOpenSetName()}}>

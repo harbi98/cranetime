@@ -75,6 +75,20 @@ class AssetController extends Controller
             ], 404);
         }
     }
+    public function search($type, $custom_name) {
+        $assets = Asset::where('type', '=', $type)->where('custom_name', 'LIKE', '%'.$custom_name.'%')->get();
+        if($assets) {
+            return response()->json([
+                'status' => 200,
+                'data' => $assets
+            ], 200);
+        } else {
+            return response()->json([
+                'status' => 404,
+                'data' => 'No Records Found'
+            ], 404);
+        }
+    }
     public function updateName(Request $request, int $id) {
         $validator = Validator::make($request->all(), [
             'custom_name' => 'required',

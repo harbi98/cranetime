@@ -12,6 +12,7 @@ Route::middleware('auth:api')->group( function () {
     Route::get('assets/{type}', [AssetController::class, 'index']);
     Route::post('assets', [AssetController::class, 'store']);
     Route::get('asset/{id}', [AssetController::class, 'show']);
+    Route::get('asset/search/{type}/{custom_name}', [AssetController::class, 'search']);
     Route::put('asset/{id}/edit-name', [AssetController::class, 'updateName']);
     Route::put('asset/{id}/edit-type', [AssetController::class, 'updateType']);
     Route::put('asset/{id}/edit-make-model', [AssetController::class, 'updateMakeModel']);

@@ -221,6 +221,7 @@ function DeliveryBays() {
         console.log(res.data.message);
         handleClose();
         showAssets();
+        showAsset_onLoad();
       })
     } catch(e) {
       console.log(e);
@@ -347,7 +348,7 @@ function DeliveryBays() {
             <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between', borderBottom: 2, borderColor: '#edf2f6', padding: '20px' }}>
               <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', justifyContent: 'center', padding: '10px 20px'}}>
                 <Typography sx={{fontSize: 18, color: '#808080', fontWeight: '300'}}>Maximum Length</Typography>
-                <Typography sx={{fontSize: 24, color: '#808080'}}>{assetMaxLength ? assetMaxLength : 'N/A'} - {assetUnit ? assetUnit : 'N/A'}</Typography>
+                <Typography sx={{fontSize: 24, color: '#808080'}}>{assetMaxLength ? assetMaxLength : 'N/A'} {assetUnit ? assetUnit : 'N/A'}</Typography>
               </Box>
               <Box sx={{ display: 'flex', width: '100px', borderLeft: 2, borderColor: '#edf2f6', alignItems: 'center', justifyContent: 'center'}}>
                 <IconButton>
