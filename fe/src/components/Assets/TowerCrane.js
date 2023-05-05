@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import '../../Style.css';
-import { Box, Typography, Button, Modal, TextField, IconButton, Autocomplete } from '@mui/material';
+import { Box, Typography, Button, Modal, TextField, IconButton, Autocomplete, Tab, Tabs } from '@mui/material';
 import axios from 'axios';
 import { styled } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
@@ -91,7 +91,7 @@ const ListButton = styled(Button)({
   fontWeight: '300',
   backgroundColor: '#fffff',
   lineHeight: 1.5,
-  borderColor: '#0f72bd',
+  borderBottom: '1px solid #edf2f6',
   color: '#505e71',
   fontFamily: [
       '-apple-system',
@@ -106,11 +106,53 @@ const ListButton = styled(Button)({
       '"Segoe UI Symbol"',
   ].join(','),
   '&:hover': {
-      backgroundColor: '#e0e0e0',
-      borderColor: '#e0e0e0',
-      boxShadow: 'none',
+    backgroundColor: '#f9fbfd',
+    boxShadow: 'none',
   }
 });
+const AntTabs = styled(Tabs)({
+  display: 'flex',
+  height: '300px',
+  '& .MuiTabs-indicator': {
+    backgroundColor: '#1890ff',
+  },
+});
+
+const AntTab = styled((props) => <Tab disableRipple {...props} />)(({ theme }) => ({
+  minHeight: '100px',
+  borderBottom: '1px solid #edf2f6',
+  textTransform: 'none',
+  minWidth: '415px',
+  fontWeight: theme.typography.fontWeightRegular,
+  marginRight: theme.spacing(1),
+  color: '#7f8fa4',
+  img: {
+    filter: "invert(73%) sepia(6%) saturate(1288%) hue-rotate(175deg) brightness(98%) contrast(82%)"
+  },
+  fontFamily: [
+    '-apple-system',
+    'BlinkMacSystemFont',
+    '"Segoe UI"',
+    'Roboto',
+    '"Helvetica Neue"',
+    'Arial',
+    'sans-serif',
+    '"Apple Color Emoji"',
+    '"Segoe UI Emoji"',
+    '"Segoe UI Symbol"',
+  ].join(','),
+  '&:hover': {
+    backgroundColor: '#f9fbfd',
+    boxShadow: "10px 0 5px -5px rgba(103, 162, 206, 0.05) inset"
+  },
+  '&.Mui-selected': {
+    color: '#0f72bd',
+    img: {
+      filter: "invert(29%) sepia(100%) saturate(1141%) hue-rotate(181deg) brightness(96%) contrast(88%)"
+    },
+    fontWeight: theme.typography.fontWeightMedium,
+  },
+}));
 const style = {
   position: 'absolute',
   top: '50%',
@@ -122,6 +164,11 @@ const style = {
 };
 
 function TowerCrane() {
+  const [tabIndex, setTabIndex] = useState(0);
+  const handleChange = (event, newValue) => {
+    setTabIndex(newValue);
+  };
+
   const [craneAssets, setCraneAssets] = useState([]);
 
   const [assetID, setAssetID] = useState();
@@ -188,7 +235,7 @@ function TowerCrane() {
         setAssetName(res.data.data.custom_name);
         setCustomName(res.data.data.custom_name);
 
-        setAssetEquipmentType(res.data.data.equipment_type);
+        setAssetEquipmentType(res.data.data.equipment_type);  
         setEquipmentType(res.data.data.equipment_type);
 
         setAssetMake(res.data.data.make);
@@ -198,6 +245,8 @@ function TowerCrane() {
         setModel(res.data.data.model);
 
         setAssetSupplier(res.data.data.supplier);
+        
+        setTabIndex("1");
       })
     } catch(e) {
       console.log(e);
@@ -352,72 +401,9 @@ function TowerCrane() {
     showAssets();
     showAsset_onLoad(); // eslint-disable-next-line
   }, [])
-
-  return (
-    <>
-      <Box sx={{
-          position: 'relative', 
-          width: 415,
-          maxWidth: 415,
-          paddingBottom: '100px',
-          boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)', 
-          zIndex: 5,
-        }}
-      >
-        <Box display="flex" sx={{
-          height: '75px',
-          borderBottom: 2,
-          borderColor: '#edf2f6',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-          <Box borderRight={2} borderColor='#e0e0e0' sx={{display: 'flex', width:100, height:75}}>
-            <Button sx={{flexDirection: 'column', width: '100%', height: '100%'}}>
-                <Box border={2} borderColor='#9cb1cd' sx={{width: '20px', marginBottom: '2px', borderRadius: 1}}/>
-                <Box border={2} borderColor='#9cb1cd' sx={{width: '13px', marginBottom: '2px', borderRadius: 1}}/>
-                <Box border={2} borderColor='#9cb1cd' sx={{width: '5px', borderRadius: 1}}/>
-            </Button>
-          </Box>
-          <TextField
-            sx={{width: '100%', margin: '0 5px'}}
-            placeholder='Search Tower Cranes...'
-            InputProps={{
-              endAdornment: (
-                <SearchIcon/>
-              ),
-            }}
-            onChange={(e) => searchAsset(e.target.value)}
-            />
-        </Box>
-        <Box display="flex" sx={{
-          height: '100%',
-        }}>
-          <Box display="flex" sx={{height: '100%'}}>
-            <div style={{ width: 415, overflow: "hidden", overflowY: 'scroll', height: 'calc(100% - 75px)'}}>
-              {
-                craneAssets.map((craneAssets) => (
-                  <Box sx={{display: 'flex', minHeight: 100, borderBottom: 2, borderBottomColor: '#edf2f6'}} key={craneAssets['id']}>
-                    <ListButton onClick={() => showAsset(craneAssets['id'])}>{craneAssets.custom_name}<ChevronRight/></ListButton>
-                  </Box>
-                ))
-              }
-            </div>
-            <Box display="flex" justifyContent="center" alignItems="center" sx={{position: 'fixed', bottom: 0, height: '100px', width: 415, padding: '15px 20px', borderTop: 2, borderTopColor: '#edf2f6'}}>
-              <AddButton sx={{width: '100%', height: '100%'}} onClick={() => handleOpen()}>Add Crane</AddButton>
-            </Box>
-          </Box>
-        </Box>
-      </Box>
-      <Box sx={{display: 'flex', width: '100%'}}>
-        <Box sx={{
-            width: 415,
-            maxWidth: 415,
-            height: '100%',
-            paddingBottom: '100px',
-            boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)', 
-            zIndex: 5,
-          }}
-        ></Box>
+  const tabView = () => {
+    if(tabIndex === "1") {
+      return (
         <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', height: '100%', minWidth: '500px'}}>
           <Box sx={{
               display: 'flex',
@@ -480,6 +466,451 @@ function TowerCrane() {
             </Box>
           </Box>
         </Box>
+      )
+    } else if(tabIndex === "2") {
+      return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', height: '100%', minWidth: '500px'}}>
+          <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              top: 0,
+              width: '100%',
+              height: '75px',
+              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)', 
+              zIndex: 5,
+              padding : '10px 50px',
+            }}
+          >
+            <Typography>Location</Typography>
+          </Box>
+        </Box>
+      )
+    } else if(tabIndex === "3") {
+      return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', height: '100%', minWidth: '500px'}}>
+          <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              top: 0,
+              width: '100%',
+              height: '75px',
+              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)', 
+              zIndex: 5,
+              padding : '10px 50px',
+            }}
+          >
+            <Typography>Capacity Matrix</Typography>
+          </Box>
+        </Box>
+      )
+    } else if(tabIndex === "4") {
+      return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', height: '100%', minWidth: '500px'}}>
+          <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              top: 0,
+              width: '100%',
+              height: '75px',
+              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)', 
+              zIndex: 5,
+              padding : '10px 50px',
+            }}
+          >
+            <Typography>Delivery Bays</Typography>
+          </Box>
+        </Box>
+      )
+    } else if(tabIndex === "5") {
+      return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', height: '100%', minWidth: '500px'}}>
+          <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              top: 0,
+              width: '100%',
+              height: '75px',
+              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)', 
+              zIndex: 5,
+              padding : '10px 50px',
+            }}
+          >
+            <Typography>Loading Platforms</Typography>
+          </Box>
+        </Box>
+      )
+    } else if(tabIndex === "6") {
+      return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', height: '100%', minWidth: '500px'}}>
+          <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              top: 0,
+              width: '100%',
+              height: '75px',
+              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)', 
+              zIndex: 5,
+              padding : '10px 50px',
+            }}
+          >
+            <Typography>Mobile Cranes</Typography>
+          </Box>
+        </Box>
+      )
+    } else if(tabIndex === "7") {
+      return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', height: '100%', minWidth: '500px'}}>
+          <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              top: 0,
+              width: '100%',
+              height: '75px',
+              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)', 
+              zIndex: 5,
+              padding : '10px 50px',
+            }}
+          >
+            <Typography>Hoist</Typography>
+          </Box>
+        </Box>
+      )
+    } else if(tabIndex === "8") {
+      return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', height: '100%', minWidth: '500px'}}>
+          <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              top: 0,
+              width: '100%',
+              height: '75px',
+              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)', 
+              zIndex: 5,
+              padding : '10px 50px',
+            }}
+          >
+            <Typography>Material Handling</Typography>
+          </Box>
+        </Box>
+      )
+    } else if(tabIndex === "9") {
+      return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', height: '100%', minWidth: '500px'}}>
+          <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              top: 0,
+              width: '100%',
+              height: '75px',
+              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)', 
+              zIndex: 5,
+              padding : '10px 50px',
+            }}
+          >
+            <Typography>Concrete Pumps</Typography>
+          </Box>
+        </Box>
+      )
+    } else if(tabIndex === "10") {
+      return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', height: '100%', minWidth: '500px'}}>
+          <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              top: 0,
+              width: '100%',
+              height: '75px',
+              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)', 
+              zIndex: 5,
+              padding : '10px 50px',
+            }}
+          >
+            <Typography>Availability</Typography>
+          </Box>
+        </Box>
+      )
+    }
+  }
+  return (
+    <>
+      <Box sx={{
+          position: 'relative', 
+          width: 415,
+          maxWidth: 415,
+          paddingBottom: '100px',
+          boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)', 
+          zIndex: 5,
+        }}
+      >
+        <Box display="flex" sx={{
+          height: '75px',
+          borderBottom: 2,
+          borderColor: '#edf2f6',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          <Box borderRight={2} borderColor='#e0e0e0' sx={{display: 'flex', width:100, height:75}}>
+            <Button sx={{flexDirection: 'column', width: '100%', height: '100%'}}>
+                <Box border={2} borderColor='#9cb1cd' sx={{width: '20px', marginBottom: '2px', borderRadius: 1}}/>
+                <Box border={2} borderColor='#9cb1cd' sx={{width: '13px', marginBottom: '2px', borderRadius: 1}}/>
+                <Box border={2} borderColor='#9cb1cd' sx={{width: '5px', borderRadius: 1}}/>
+            </Button>
+          </Box>
+          <TextField
+            sx={{width: '100%', margin: '0 5px'}}
+            placeholder='Search Tower Cranes...'
+            InputProps={{
+              endAdornment: (
+                <SearchIcon/>
+              ),
+            }}
+            onChange={(e) => searchAsset(e.target.value)}
+            />
+        </Box>
+        <Box display="flex" sx={{
+          height: '100%',
+        }}>
+          <Box display="flex" sx={{height: '100%'}}>
+            <div style={{ width: 415, overflow: "hidden", overflowY: 'scroll', height: 'calc(100% - 75px)'}}>
+              {
+                craneAssets.map((craneAssets) => (
+                  <Box sx={{display: 'flex', minHeight: 100}} key={craneAssets['id']}>
+                    <ListButton onClick={() => showAsset(craneAssets['id'])}>{craneAssets.custom_name}<ChevronRight/></ListButton>
+                  </Box>
+                ))
+              }
+            </div>
+            <Box display="flex" justifyContent="center" alignItems="center" sx={{position: 'fixed', bottom: 0, height: '100px', width: 415, padding: '15px 20px', borderTop: 2, borderTopColor: '#edf2f6'}}>
+              <AddButton sx={{width: '100%', height: '100%'}} onClick={() => handleOpen()}>Add Crane</AddButton>
+            </Box>
+          </Box>
+        </Box>
+      </Box>
+      <Box sx={{display: 'flex', width: '100%'}}>
+        <Box sx={{
+          overflow: 'auto',
+          width: 415,
+          maxWidth: 415,
+          height: '100%',
+          boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)',
+        }}
+        >
+          <Box sx={{
+            padding: '30px',
+            borderBottom: 1,
+            borderBottomColor: '#edf2f6',
+          }}>
+            <Box sx={{
+              minHeight: '215px',
+              borderRadius: '3px',
+              border: 1,
+              borderColor: '#edf2f6',
+              backgroundColor: '#f9fbfd',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: '25px'
+            }}>
+              <img style={{width: '32px', height: '32px', filter: "invert(36%) sepia(18%) saturate(535%) hue-rotate(175deg) brightness(94%) contrast(93%)"}} src={require("../../icons/crane.png")} alt="Crane"/>
+            </Box>
+            <Box sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              textAlign: 'center',
+            }}>
+              <Typography sx={{color: '#505e71', fontWeight: 300, fontSize: '1.5rem'}}>{assetName ? assetName : 'N/A'}</Typography>
+            </Box>
+          </Box>
+          <Box sx={{
+            display: 'flex',
+            padding: '15px 20px',
+            borderBottom: 1,
+            borderBottomColor: '#edf2f6'
+          }}>
+            <Typography sx={{display: 'inline-block', fontWeight: 300, fontSize: '0.875rem', color: '#889ab1'}}>Crane Settings</Typography>
+          </Box>
+          <Box display="block">
+            <AntTabs
+              orientation='vertical'
+              value={tabIndex}
+              onChange={handleChange}
+              TabIndicatorProps={{
+                sx: {
+                  left: 5,
+                  width: 5,
+                  borderRadius: 2,
+                },
+                style: {
+                  backgroundColor: '#0f72bd',
+                }
+              }}
+              sx={{height: '100%'}}
+              scrollButtons={false}
+            >
+              <AntTab value="1" label={
+                  <React.Fragment>
+                    <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <img style={{width: '32px', height: '32px'}} src={require("../../icons/crane.png")} alt="Crane"/>
+                        <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
+                        <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Crane Info</Typography>
+                      </Box>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <ChevronRight/>
+                      </Box>
+                    </Box>
+                  </React.Fragment>
+                }
+              />
+              <AntTab value="2" label={
+                  <React.Fragment>
+                    <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <img style={{width: '32px', height: '32px'}} src={require("../../icons/pin.png")} alt="Location"/>
+                        <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
+                        <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Location</Typography>
+                      </Box>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <ChevronRight/>
+                      </Box>
+                    </Box>
+                  </React.Fragment>
+                }
+              />
+              <AntTab value="3" label={
+                  <React.Fragment>
+                    <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <img style={{width: '32px', height: '32px'}} src={require("../../icons/grid.png")} alt="Grid"/>
+                        <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
+                        <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Capacity Matrix</Typography>
+                      </Box>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <ChevronRight/>
+                      </Box>
+                    </Box>
+                  </React.Fragment>
+                }
+              />
+              <AntTab value="4" label={
+                  <React.Fragment>
+                    <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <img style={{width: '32px', height: '32px'}} src={require("../../icons/truck.png")} alt="Delivery Bays"/>
+                        <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
+                        <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Delivery Bays</Typography>
+                      </Box>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <ChevronRight/>
+                      </Box>
+                    </Box>
+                  </React.Fragment>
+                }
+              />
+              <AntTab value="5" label={
+                  <React.Fragment>
+                    <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <img style={{width: '32px', height: '32px'}} src={require("../../icons/platform.png")} alt="Loading Platforms"/>
+                        <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
+                        <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Loading Platforms</Typography>
+                      </Box>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <ChevronRight/>
+                      </Box>
+                    </Box>
+                  </React.Fragment>
+                }
+              />
+              <AntTab value="6" label={
+                  <React.Fragment>
+                    <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <img style={{width: '32px', height: '32px'}} src={require("../../icons/mcrane.png")} alt="Mobile Cranes"/>
+                        <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
+                        <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Mobile Cranes</Typography>
+                      </Box>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <ChevronRight/>
+                      </Box>
+                    </Box>
+                  </React.Fragment>
+                }
+              />
+              <AntTab value="7" label={
+                  <React.Fragment>
+                    <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <img style={{width: '32px', height: '32px'}} src={require("../../icons/elevator.png")} alt="Hoist"/>
+                        <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
+                        <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Hoist</Typography>
+                      </Box>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <ChevronRight/>
+                      </Box>
+                    </Box>
+                  </React.Fragment>
+                }
+              />
+              <AntTab value="8" label={
+                  <React.Fragment>
+                    <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <img style={{width: '32px', height: '32px'}} src={require("../../icons/lifter.png")} alt="Material Handling"/>
+                        <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
+                        <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Material Handling</Typography>
+                      </Box>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <ChevronRight/>
+                      </Box>
+                    </Box>
+                  </React.Fragment>
+                }
+              />
+              <AntTab value="9" label={
+                  <React.Fragment>
+                    <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <img style={{width: '32px', height: '32px'}} src={require("../../icons/concrete-truck.png")} alt="Concrete Pumps"/>
+                        <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
+                        <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Concrete Pumps</Typography>
+                      </Box>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <ChevronRight/>
+                      </Box>
+                    </Box>
+                  </React.Fragment>
+                }
+              />
+              <AntTab value="10" label={
+                  <React.Fragment>
+                    <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <img style={{width: '32px', height: '32px'}} src={require("../../icons/calendar.png")} alt="Availability"/>
+                        <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
+                        <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Availability</Typography>
+                      </Box>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <ChevronRight/>
+                      </Box>
+                    </Box>
+                  </React.Fragment>
+                }
+              />
+            </AntTabs>
+          </Box>
+        </Box>
+        {tabView()}
       </Box>
       {/* ------------------------------------- //////////////// Modals ///////////////// ------------------------------------- */}
       <Modal

@@ -45,12 +45,14 @@ export const AuthProvider = ({children}) => {
       })
       .then((res) => {
         alert("Status Code: " + res.data.status + "\nMessage: " + res.data.message);
-        setToken(localStorage.removeItem('token'));
+        setToken();
         localStorage.removeItem('token');
         window.location.reload();
       })
       .catch((error) => {
         alert("Status Code: " + error.response.data.status + "\nMessage: " + error.response.data.message);
+        setToken();
+        window.location.reload();
       })
     } catch(e) {
       //console.log(e);

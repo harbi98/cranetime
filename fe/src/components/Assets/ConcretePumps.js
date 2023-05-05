@@ -321,7 +321,7 @@ function BuildingHoist() {
             <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between', borderBottom: 2, borderColor: '#edf2f6', padding: '20px' }}>
               <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', justifyContent: 'center', padding: '10px 20px'}}>
                 <Typography sx={{fontSize: 18, color: '#808080', fontWeight: '300'}}>Name</Typography>
-                <Typography sx={{fontSize: 24, color: '#808080'}}>{assetName}</Typography>
+                <Typography sx={{fontSize: 24, color: '#808080'}}>{assetName ? assetName : 'N/A'}</Typography>
               </Box>
               <Box sx={{ display: 'flex', width: '100px', borderLeft: 2, borderColor: '#edf2f6', alignItems: 'center', justifyContent: 'center'}}>
                 <IconButton onClick={() => handleOpenSetName()}>
