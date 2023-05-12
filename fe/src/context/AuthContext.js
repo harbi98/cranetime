@@ -15,7 +15,7 @@ export const AuthProvider = ({children}) => {
           password: password,
       };
       try {
-        axios.post('http://127.0.0.1:8000/api/login', data, {
+        axios.post('http://54.253.54.83/api/login', data, {
           headers: headers
         })
         .then((res) => {
@@ -40,7 +40,7 @@ export const AuthProvider = ({children}) => {
 
     }
     try {
-      axios.post('http://127.0.0.1:8000/api/logout', data, {
+      axios.post('http://54.253.54.83/api/logout', data, {
         headers: headers
       })
       .then((res) => {

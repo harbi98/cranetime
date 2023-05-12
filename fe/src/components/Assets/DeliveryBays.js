@@ -151,7 +151,7 @@ function DeliveryBays() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.get('http://127.0.0.1:8000/api/assets/bays', {
+      axios.get('http://54.253.54.83/api/assets/bays', {
         headers: headers
       })
       .then((res) => {
@@ -167,7 +167,7 @@ function DeliveryBays() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.get('http://127.0.0.1:8000/api/asset/'+id, {
+      axios.get('http://54.253.54.83/api/asset/'+id, {
         headers: headers
       })
       .then((res) => {
@@ -191,7 +191,7 @@ function DeliveryBays() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.get('http://127.0.0.1:8000/api/assets/bays', {
+      axios.get('http://54.253.54.83/api/assets/bays', {
         headers: headers
       })
       .then((res) => {
@@ -214,7 +214,7 @@ function DeliveryBays() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.post('http://127.0.0.1:8000/api/assets', data, {
+      axios.post('http://54.253.54.83/api/assets', data, {
         headers: headers
       })
       .then((res) => {
@@ -236,7 +236,7 @@ function DeliveryBays() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.put('http://127.0.0.1:8000/api/asset/'+assetID+'/edit-name', data, {
+      axios.put('http://54.253.54.83/api/asset/'+assetID+'/edit-name', data, {
         headers: headers
       })
       .then((res) => {

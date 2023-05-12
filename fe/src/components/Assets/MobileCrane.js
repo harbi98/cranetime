@@ -152,7 +152,7 @@ function MobileCrane() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.get('http://127.0.0.1:8000/api/assets/mcrane', {
+      axios.get('http://54.253.54.83/api/assets/mcrane', {
         headers: headers
       })
       .then((res) => {
@@ -168,7 +168,7 @@ function MobileCrane() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.get('http://127.0.0.1:8000/api/asset/'+id, {
+      axios.get('http://54.253.54.83/api/asset/'+id, {
         headers: headers
       })
       .then((res) => {
@@ -196,7 +196,7 @@ function MobileCrane() {
     };
     if(custom_name !== "") {
       try {
-        axios.get('http://127.0.0.1:8000/api/asset/search/mcrane/'+custom_name, {
+        axios.get('http://54.253.54.83/api/asset/search/mcrane/'+custom_name, {
           headers: headers
         })
         .then((res) => {
@@ -227,7 +227,7 @@ function MobileCrane() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.get('http://127.0.0.1:8000/api/assets/mcrane', {
+      axios.get('http://54.253.54.83/api/assets/mcrane', {
         headers: headers
       })
       .then((res) => {
@@ -250,7 +250,7 @@ function MobileCrane() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.post('http://127.0.0.1:8000/api/assets', data, {
+      axios.post('http://54.253.54.83/api/assets', data, {
         headers: headers
       })
       .then((res) => {
@@ -272,7 +272,7 @@ function MobileCrane() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.put('http://127.0.0.1:8000/api/asset/'+assetID+'/edit-name', data, {
+      axios.put('http://54.253.54.83/api/asset/'+assetID+'/edit-name', data, {
         headers: headers
       })
       .then((res) => {
@@ -295,7 +295,7 @@ function MobileCrane() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.put('http://127.0.0.1:8000/api/asset/'+assetID+'/edit-make-model', data, {
+      axios.put('http://54.253.54.83/api/asset/'+assetID+'/edit-make-model', data, {
         headers: headers
       })
       .then((res) => {
