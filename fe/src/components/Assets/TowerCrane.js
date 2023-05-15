@@ -210,7 +210,7 @@ function TowerCrane() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.get('http://54.253.54.83/api/assets/crane', {
+      axios.get('http://127.0.0.1:8000/api/assets/crane', {
         headers: headers
       })
       .then((res) => {
@@ -226,7 +226,7 @@ function TowerCrane() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.get('http://54.253.54.83/api/asset/'+id, {
+      axios.get('http://127.0.0.1:8000/api/asset/'+id, {
         headers: headers
       })
       .then((res) => {
@@ -260,7 +260,7 @@ function TowerCrane() {
     };
     if(custom_name !== "") {
       try {
-        axios.get('http://54.253.54.83/api/asset/search/crane/'+custom_name, {
+        axios.get('http://127.0.0.1:8000/api/asset/search/crane/'+custom_name, {
           headers: headers
         })
         .then((res) => {
@@ -293,7 +293,7 @@ function TowerCrane() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.get('http://54.253.54.83/api/assets/crane', {
+      axios.get('http://127.0.0.1:8000/api/assets/crane', {
         headers: headers
       })
       .then((res) => {
@@ -317,7 +317,7 @@ function TowerCrane() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.post('http://54.253.54.83/api/assets', data, {
+      axios.post('http://127.0.0.1:8000/api/assets', data, {
         headers: headers
       })
       .then((res) => {
@@ -339,7 +339,7 @@ function TowerCrane() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.put('http://54.253.54.83/api/asset/'+assetID+'/edit-name', data, {
+      axios.put('http://127.0.0.1:8000/api/asset/'+assetID+'/edit-name', data, {
         headers: headers
       })
       .then((res) => {
@@ -361,7 +361,7 @@ function TowerCrane() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.put('http://54.253.54.83/api/asset/'+assetID+'/edit-type', data, {
+      axios.put('http://127.0.0.1:8000/api/asset/'+assetID+'/edit-type', data, {
         headers: headers
       })
       .then((res) => {
@@ -384,7 +384,7 @@ function TowerCrane() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.put('http://54.253.54.83/api/asset/'+assetID+'/edit-make-model', data, {
+      axios.put('http://127.0.0.1:8000/api/asset/'+assetID+'/edit-make-model', data, {
         headers: headers
       })
       .then((res) => {
@@ -409,21 +409,19 @@ function TowerCrane() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              top: 0,
               width: '100%',
-              height: '75px',
-              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)', 
-              zIndex: 5,
-              padding : '10px 50px',
+              height: '65px',
+              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)',
+              padding : '0 10px 0 25px',
             }}
           >
-            <Typography>Tower Crane Info</Typography>
+            <p style={{fontSize: '1.5rem', fontWeight: '300', color: '#505e71'}}>Tower Crane Info</p>
           </Box>
           <Box sx={{display: 'flex', flexDirection: 'column', height: 'calc(100% - 75px)'}}>
-            <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between', borderBottom: 2, borderColor: '#edf2f6', padding: '20px' }}>
-              <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', justifyContent: 'center', padding: '10px 20px'}}>
-                <Typography sx={{fontSize: 18, color: '#808080', fontWeight: '300'}}>Name</Typography>
-                <Typography sx={{fontSize: 24, color: '#808080'}}>{assetName ? assetName : 'N/A'}</Typography>
+            <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between', borderBottom: '1px solid #edf2f6', borderColor: '#edf2f6', padding: '30px' }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', justifyContent: 'center'}}>
+                <p style={{fontSize: '0.875rem', color: '#889ab1', fontWeight: '300', marginBottom: '5px'}}>Name</p>
+                <p style={{fontSize: '1.125rem', fontWeight: '200', color: '#505e71', textOverflow: 'ellipsis', overflow: 'hidden'}}>{assetName ? assetName : 'N/A'}</p>
               </Box>
               <Box sx={{ display: 'flex', width: '100px', borderLeft: 2, borderColor: '#edf2f6', alignItems: 'center', justifyContent: 'center'}}>
                 <IconButton onClick={() => {handleOpenSetName()}}>
@@ -431,10 +429,10 @@ function TowerCrane() {
                 </IconButton>
               </Box>
             </Box>
-            <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between', borderBottom: 2, borderColor: '#edf2f6', padding: '20px' }}>
-              <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', justifyContent: 'center', padding: '10px 20px'}}>
-                <Typography sx={{fontSize: 18, color: '#808080', fontWeight: '300'}}>Type</Typography>
-                <Typography sx={{fontSize: 24, color: '#808080'}}>{assetEquipmentType ? assetEquipmentType : 'N/A'}</Typography>
+            <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between', borderBottom: 2, borderColor: '#edf2f6', padding: '30px' }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', justifyContent: 'center'}}>
+                <p style={{fontSize: '0.875rem', color: '#889ab1', fontWeight: '300', marginBottom: '5px'}}>Type</p>
+                <p style={{fontSize: '1.125rem', fontWeight: '200', color: '#505e71', textOverflow: 'ellipsis', overflow: 'hidden'}}>{assetEquipmentType ? assetEquipmentType : 'N/A'}</p>
               </Box>
               <Box sx={{ display: 'flex', width: '100px', borderLeft: 2, borderColor: '#edf2f6', alignItems: 'center', justifyContent: 'center'}}>
                 <IconButton onClick={() => {handleOpenSetType()}}>
@@ -442,10 +440,10 @@ function TowerCrane() {
                 </IconButton>
               </Box>
             </Box>
-            <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between', borderBottom: 2, borderColor: '#edf2f6', padding: '20px' }}>
-              <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', justifyContent: 'center', padding: '10px 20px'}}>
-                <Typography sx={{fontSize: 18, color: '#808080', fontWeight: '300'}}>Make & Model</Typography>
-                <Typography sx={{fontSize: 24, color: '#808080'}}>{assetMake ? assetMake : 'N/A'} - {assetModel ? assetModel : 'N/A'}</Typography>
+            <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between', borderBottom: 2, borderColor: '#edf2f6', padding: '30px' }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', justifyContent: 'center'}}>
+                <p style={{fontSize: '0.875rem', color: '#889ab1', fontWeight: '300', marginBottom: '5px'}}>Make & Model</p>
+                <p style={{fontSize: '1.125rem', fontWeight: '200', color: '#505e71', textOverflow: 'ellipsis', overflow: 'hidden'}}>{assetMake ? assetMake : 'N/A'} - {assetModel ? assetModel : 'N/A'}</p>
               </Box>
               <Box sx={{ display: 'flex', width: '100px', borderLeft: 2, borderColor: '#edf2f6', alignItems: 'center', justifyContent: 'center'}}>
                 <IconButton onClick={() => {handleOpenSetMakeModel()}}>
@@ -453,10 +451,10 @@ function TowerCrane() {
                 </IconButton>
               </Box>
             </Box>
-            <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between', borderBottom: 2, borderColor: '#edf2f6', padding: '20px' }}>
-              <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', justifyContent: 'center', padding: '10px 20px'}}>
-                <Typography sx={{fontSize: 18, color: '#808080', fontWeight: '300'}}>Supplier</Typography>
-                <Typography sx={{fontSize: 24, color: '#808080'}}>{assetSupplier ? assetSupplier : 'N/A' }</Typography>
+            <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between', borderBottom: 2, borderColor: '#edf2f6', padding: '30px' }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', justifyContent: 'center'}}>
+                <p style={{fontSize: '0.875rem', color: '#889ab1', fontWeight: '300', marginBottom: '5px'}}>Supplier</p>
+                <p style={{fontSize: '1.125rem', fontWeight: '200', color: '#505e71', textOverflow: 'ellipsis', overflow: 'hidden'}}>{assetSupplier ? assetSupplier : 'N/A' }</p>
               </Box>
               <Box sx={{ display: 'flex', width: '100px', borderLeft: 2, borderColor: '#edf2f6', alignItems: 'center', justifyContent: 'center'}}>
                 <IconButton>
@@ -474,15 +472,13 @@ function TowerCrane() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              top: 0,
               width: '100%',
-              height: '75px',
-              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)', 
-              zIndex: 5,
-              padding : '10px 50px',
+              height: '65px',
+              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)',
+              padding : '0 10px 0 25px',
             }}
           >
-            <Typography>Location</Typography>
+            <p style={{fontSize: '1.5rem', fontWeight: '300', color: '#505e71'}}>Location</p>
           </Box>
         </Box>
       )
@@ -493,15 +489,13 @@ function TowerCrane() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              top: 0,
               width: '100%',
-              height: '75px',
-              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)', 
-              zIndex: 5,
-              padding : '10px 50px',
+              height: '65px',
+              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)',
+              padding : '0 10px 0 25px',
             }}
           >
-            <Typography>Capacity Matrix</Typography>
+            <p style={{fontSize: '1.5rem', fontWeight: '300', color: '#505e71'}}>Capacity Matrix</p>
           </Box>
         </Box>
       )
@@ -512,15 +506,13 @@ function TowerCrane() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              top: 0,
               width: '100%',
-              height: '75px',
-              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)', 
-              zIndex: 5,
-              padding : '10px 50px',
+              height: '65px',
+              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)',
+              padding : '0 10px 0 25px',
             }}
           >
-            <Typography>Delivery Bays</Typography>
+            <p style={{fontSize: '1.5rem', fontWeight: '300', color: '#505e71'}}>Delivery Bays</p>
           </Box>
         </Box>
       )
@@ -531,15 +523,13 @@ function TowerCrane() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              top: 0,
               width: '100%',
-              height: '75px',
-              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)', 
-              zIndex: 5,
-              padding : '10px 50px',
+              height: '65px',
+              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)',
+              padding : '0 10px 0 25px',
             }}
           >
-            <Typography>Loading Platforms</Typography>
+            <p style={{fontSize: '1.5rem', fontWeight: '300', color: '#505e71'}}>Loading Platforms</p>
           </Box>
         </Box>
       )
@@ -550,15 +540,13 @@ function TowerCrane() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              top: 0,
               width: '100%',
-              height: '75px',
-              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)', 
-              zIndex: 5,
-              padding : '10px 50px',
+              height: '65px',
+              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)',
+              padding : '0 10px 0 25px',
             }}
           >
-            <Typography>Mobile Cranes</Typography>
+            <p style={{fontSize: '1.5rem', fontWeight: '300', color: '#505e71'}}>Mobile Cranes</p>
           </Box>
         </Box>
       )
@@ -569,15 +557,13 @@ function TowerCrane() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              top: 0,
               width: '100%',
-              height: '75px',
-              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)', 
-              zIndex: 5,
-              padding : '10px 50px',
+              height: '65px',
+              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)',
+              padding : '0 10px 0 25px',
             }}
           >
-            <Typography>Hoist</Typography>
+            <p style={{fontSize: '1.5rem', fontWeight: '300', color: '#505e71'}}>Hoist</p>
           </Box>
         </Box>
       )
@@ -588,15 +574,13 @@ function TowerCrane() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              top: 0,
               width: '100%',
-              height: '75px',
-              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)', 
-              zIndex: 5,
-              padding : '10px 50px',
+              height: '65px',
+              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)',
+              padding : '0 10px 0 25px',
             }}
           >
-            <Typography>Material Handling</Typography>
+            <p style={{fontSize: '1.5rem', fontWeight: '300', color: '#505e71'}}>Material Handling</p>
           </Box>
         </Box>
       )
@@ -607,34 +591,53 @@ function TowerCrane() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              top: 0,
               width: '100%',
-              height: '75px',
-              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)', 
-              zIndex: 5,
-              padding : '10px 50px',
+              height: '65px',
+              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)',
+              padding : '0 10px 0 25px',
             }}
           >
-            <Typography>Concrete Pumps</Typography>
+            <p style={{fontSize: '1.5rem', fontWeight: '300', color: '#505e71'}}>Concrete Pumps</p>
           </Box>
         </Box>
       )
     } else if(tabIndex === "10") {
       return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', height: '100%', minWidth: '500px'}}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', width: '100%', overflowY: 'scroll'}}>
           <Box sx={{
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              top: 0,
               width: '100%',
-              height: '75px',
-              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)', 
-              zIndex: 5,
-              padding : '10px 50px',
+              height: '65px',
+              minHeight: '65px',
+              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)',
+              padding : '0 10px 0 25px',
             }}
           >
-            <Typography>Availability</Typography>
+            <p style={{fontSize: '1.5rem', fontWeight: '300', color: '#505e71'}}>Availability</p>
+          </Box>
+          <Box sx={{display: 'block'}}>
+            <Box sx={{textAlign: 'center', padding: '40px 0', borderBottom: '1px solid #edf2f6', backgroundColor: '#f1fdf1', boxShadow: "10px 0 5px -5px rgba(103, 162, 206, 0.1) inset"}}>
+              <p style={{fontWeight: '600', fontSize: '1.5rem', marginBottom: '5px', color: '#090'}}>Available Now</p>
+              <p style={{fontWeight: '300', fontSize: '0.875rem', color: '#090'}}>13:00 - 15:00 - Currently 13:20</p>
+            </Box>
+            <Box sx={{display: 'flex', backgroundColor: '#f9fbfd', borderBottom: '1px solid #edf2f6', padding: '30px 0', boxShadow: "10px 0 5px -5px rgba(103, 162, 206, 0.1) inset"}}>
+              <Box sx={{width: '50%', padding: '0 35px'}}>
+                <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', marginBottom: '5px'}}>Custom Availability</p>
+                <p style={{color: '#889ab1', fontWeight: '300', fontSize: '0.875rem'}}>Asset availability runs off the site opening times and exemptions unless you set custom availability.</p>
+              </Box>
+              <Box sx={{width: '50%', padding: '0 25px'}}>
+                <AddButton sx={{width: '100%'}}>Add Custom Availability</AddButton>
+              </Box>
+            </Box>
+            <Box sx={{borderBottom: '1px solid #edf2f6', padding: '35px'}}>
+              <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.5rem', marginBottom: '5px'}}>Exemptions</p>
+              <p style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem'}}>Create periods either open or closed overriding all opening times.</p>
+            </Box>
+            <Box sx={{borderBottom: '1px solid #edf2f6', padding: '20px'}}>
+              <AddButton sx={{width: '100%'}}>Add Exemptions</AddButton>
+            </Box>
           </Box>
         </Box>
       )

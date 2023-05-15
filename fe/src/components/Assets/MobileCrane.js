@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import '../../Style.css';
-import { Box, Typography, Button, Modal, TextField, IconButton } from '@mui/material';
+import { Box, Typography, Button, Modal, TextField, IconButton, Tab, Tabs } from '@mui/material';
 import axios from 'axios';
 import { styled } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
@@ -111,6 +111,49 @@ const ListButton = styled(Button)({
       boxShadow: 'none',
   }
 });
+const AntTabs = styled(Tabs)({
+  display: 'flex',
+  height: '300px',
+  '& .MuiTabs-indicator': {
+    backgroundColor: '#1890ff',
+  },
+});
+
+const AntTab = styled((props) => <Tab disableRipple {...props} />)(({ theme }) => ({
+  minHeight: '100px',
+  borderBottom: '1px solid #edf2f6',
+  textTransform: 'none',
+  minWidth: '415px',
+  fontWeight: theme.typography.fontWeightRegular,
+  marginRight: theme.spacing(1),
+  color: '#7f8fa4',
+  img: {
+    filter: "invert(73%) sepia(6%) saturate(1288%) hue-rotate(175deg) brightness(98%) contrast(82%)"
+  },
+  fontFamily: [
+    '-apple-system',
+    'BlinkMacSystemFont',
+    '"Segoe UI"',
+    'Roboto',
+    '"Helvetica Neue"',
+    'Arial',
+    'sans-serif',
+    '"Apple Color Emoji"',
+    '"Segoe UI Emoji"',
+    '"Segoe UI Symbol"',
+  ].join(','),
+  '&:hover': {
+    backgroundColor: '#f9fbfd',
+    boxShadow: "10px 0 5px -5px rgba(103, 162, 206, 0.05) inset"
+  },
+  '&.Mui-selected': {
+    color: '#0f72bd',
+    img: {
+      filter: "invert(29%) sepia(100%) saturate(1141%) hue-rotate(181deg) brightness(96%) contrast(88%)"
+    },
+    fontWeight: theme.typography.fontWeightMedium,
+  },
+}));
 const style = {
   position: 'absolute',
   top: '50%',
@@ -122,6 +165,11 @@ const style = {
 };
 
 function MobileCrane() {
+  const [tabIndex, setTabIndex] = useState(0);
+  const handleChange = (event, newValue) => {
+    setTabIndex(newValue);
+  };
+
   const [craneAssets, setCraneAssets] = useState([]);
 
   const [assetID, setAssetID] = useState('');
@@ -152,7 +200,7 @@ function MobileCrane() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.get('http://54.253.54.83/api/assets/mcrane', {
+      axios.get('http://127.0.0.1:8000/api/assets/mcrane', {
         headers: headers
       })
       .then((res) => {
@@ -168,7 +216,7 @@ function MobileCrane() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.get('http://54.253.54.83/api/asset/'+id, {
+      axios.get('http://127.0.0.1:8000/api/asset/'+id, {
         headers: headers
       })
       .then((res) => {
@@ -183,6 +231,8 @@ function MobileCrane() {
         setModel(res.data.data.model);
 
         setAssetSupplier(res.data.data.supplier);
+
+        setTabIndex("1");
       })
     } catch(e) {
       console.log(e);
@@ -196,7 +246,7 @@ function MobileCrane() {
     };
     if(custom_name !== "") {
       try {
-        axios.get('http://54.253.54.83/api/asset/search/mcrane/'+custom_name, {
+        axios.get('http://127.0.0.1:8000/api/asset/search/mcrane/'+custom_name, {
           headers: headers
         })
         .then((res) => {
@@ -227,7 +277,7 @@ function MobileCrane() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.get('http://54.253.54.83/api/assets/mcrane', {
+      axios.get('http://127.0.0.1:8000/api/assets/mcrane', {
         headers: headers
       })
       .then((res) => {
@@ -250,7 +300,7 @@ function MobileCrane() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.post('http://54.253.54.83/api/assets', data, {
+      axios.post('http://127.0.0.1:8000/api/assets', data, {
         headers: headers
       })
       .then((res) => {
@@ -272,7 +322,7 @@ function MobileCrane() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.put('http://54.253.54.83/api/asset/'+assetID+'/edit-name', data, {
+      axios.put('http://127.0.0.1:8000/api/asset/'+assetID+'/edit-name', data, {
         headers: headers
       })
       .then((res) => {
@@ -295,7 +345,7 @@ function MobileCrane() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.put('http://54.253.54.83/api/asset/'+assetID+'/edit-make-model', data, {
+      axios.put('http://127.0.0.1:8000/api/asset/'+assetID+'/edit-make-model', data, {
         headers: headers
       })
       .then((res) => {
@@ -308,11 +358,295 @@ function MobileCrane() {
       console.log(e);
     }
   }
+  
   useEffect(() => {
     showAssets();
     showAsset_onLoad(); // eslint-disable-next-line
   }, [])
-
+  
+  const tabView = () => {
+    if(tabIndex === "1") {
+      return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', height: '100%', minWidth: '500px'}}>
+          <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              width: '100%',
+              height: '65px',
+              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)',
+              padding : '0 10px 0 25px',
+            }}
+          >
+            <p style={{fontSize: '1.5rem', fontWeight: '300', color: '#505e71'}}>Mobile Crane Info</p>
+          </Box>
+          <Box sx={{display: 'flex', flexDirection: 'column', height: 'calc(100% - 75px)'}}>
+            <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between', borderBottom: 2, borderColor: '#edf2f6', padding: '30px'}}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', justifyContent: 'center'}}>
+                <p style={{fontSize: '0.875rem', color: '#889ab1', fontWeight: '300', marginBottom: '5px'}}>Name</p>
+                <p style={{fontSize: '1.125rem', fontWeight: '200', color: '#505e71', textOverflow: 'ellipsis', overflow: 'hidden'}}>{assetName ? assetName : 'N/A'}</p>
+              </Box>
+              <Box sx={{ display: 'flex', width: '100px', borderLeft: 2, borderColor: '#edf2f6', alignItems: 'center', justifyContent: 'center'}}>
+                <IconButton onClick={() => {handleOpenSetName()}}>
+                  <EditIcon sx={{color: '#808080'}}/>
+                </IconButton>
+              </Box>
+            </Box>
+            <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between', borderBottom: 2, borderColor: '#edf2f6', padding: '30px' }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', justifyContent: 'center'}}>
+                <p style={{fontSize: '0.875rem', color: '#889ab1', fontWeight: '300', marginBottom: '5px'}}>Make $ Model</p>
+                <p style={{fontSize: '1.125rem', fontWeight: '200', color: '#505e71', textOverflow: 'ellipsis', overflow: 'hidden'}}>{assetMake ? assetMake : 'N/A'} - {assetModel ? assetModel : 'N/A'}</p>
+              </Box>
+              <Box sx={{ display: 'flex', width: '100px', borderLeft: 2, borderColor: '#edf2f6', alignItems: 'center', justifyContent: 'center'}}>
+                <IconButton onClick={() => handleOpenSetMakeModel()}>
+                  <EditIcon sx={{color: '#808080'}}/>
+                </IconButton>
+              </Box>
+            </Box>
+            <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between', borderBottom: 2, borderColor: '#edf2f6', padding: '30px' }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', justifyContent: 'center'}}>
+                <p style={{fontSize: '0.875rem', color: '#889ab1', fontWeight: '300', marginBottom: '5px'}}>Supplier</p>
+                <p style={{fontSize: '1.125rem', fontWeight: '200', color: '#505e71', textOverflow: 'ellipsis', overflow: 'hidden'}}>{assetSupplier ? assetSupplier : 'N/A' }</p>
+              </Box>
+              <Box sx={{ display: 'flex', width: '100px', borderLeft: 2, borderColor: '#edf2f6', alignItems: 'center', justifyContent: 'center'}}>
+                <IconButton>
+                  <EditIcon sx={{color: '#808080'}}/>
+                </IconButton>
+              </Box>
+            </Box>
+          </Box>
+        </Box>
+      )
+    } else if(tabIndex === "2") {
+      return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', height: '100%', minWidth: '500px'}}>
+          <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              width: '100%',
+              height: '65px',
+              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)',
+              padding : '0 10px 0 25px',
+            }}
+          >
+            <p style={{fontSize: '1.5rem', fontWeight: '300', color: '#505e71'}}>Location</p>
+          </Box>
+        </Box>
+      )
+    } else if(tabIndex === "3") {
+      return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', height: '100%', minWidth: '500px'}}>
+          <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              width: '100%',
+              height: '65px',
+              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)',
+              padding : '0 10px 0 25px',
+            }}
+          >
+            <p style={{fontSize: '1.5rem', fontWeight: '300', color: '#505e71'}}>Tower Cranes</p>
+          </Box>
+        </Box>
+      )
+    } else if(tabIndex === "4") {
+      return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', height: '100%', minWidth: '500px'}}>
+          <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              width: '100%',
+              height: '65px',
+              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)',
+              padding : '0 10px 0 25px',
+            }}
+          >
+            <p style={{fontSize: '1.5rem', fontWeight: '300', color: '#505e71'}}>Loading Platforms</p>
+          </Box>
+        </Box>
+      )
+    } else if(tabIndex === "5") {
+      return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', height: '100%', minWidth: '500px'}}>
+          <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              width: '100%',
+              height: '65px',
+              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)',
+              padding : '0 10px 0 25px',
+            }}
+          >
+            <p style={{fontSize: '1.5rem', fontWeight: '300', color: '#505e71'}}>Delivery Bays</p>
+          </Box>
+        </Box>
+      )
+    } else if(tabIndex === "6") {
+      return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', height: '100%', minWidth: '500px'}}>
+          <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              width: '100%',
+              height: '65px',
+              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)',
+              padding : '0 10px 0 25px',
+            }}
+          >
+            <p style={{fontSize: '1.5rem', fontWeight: '300', color: '#505e71'}}>Hoists</p>
+          </Box>
+        </Box>
+      )
+    } else if(tabIndex === "7") {
+      return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', height: '100%', minWidth: '500px'}}>
+          <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              width: '100%',
+              height: '65px',
+              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)',
+              padding : '0 10px 0 25px',
+            }}
+          >
+            <p style={{fontSize: '1.5rem', fontWeight: '300', color: '#505e71'}}>Material Handling</p>
+          </Box>
+        </Box>
+      )
+    } else if(tabIndex === "8") {
+      return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', height: '100%', minWidth: '500px'}}>
+          <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              width: '100%',
+              height: '65px',
+              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)',
+              padding : '0 10px 0 25px',
+            }}
+          >
+            <p style={{fontSize: '1.5rem', fontWeight: '300', color: '#505e71'}}>Concrete Pumps</p>
+          </Box>
+        </Box>
+      )
+    } else if(tabIndex === "9") {
+      return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', width: '100%', overflowY: 'scroll'}}>
+          <Box sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              width: '100%',
+              height: '65px',
+              minHeight: '65px',
+              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)',
+              padding : '0 10px 0 25px',
+            }}
+          >
+            <p style={{fontSize: '1.5rem', fontWeight: '300', color: '#505e71'}}>Availability</p>
+          </Box>
+          <Box sx={{display: 'block'}}>
+            <Box sx={{textAlign: 'center', padding: '40px 0', borderBottom: '1px solid #edf2f6', backgroundColor: '#f1fdf1', boxShadow: "10px 0 5px -5px rgba(103, 162, 206, 0.1) inset"}}>
+              <p style={{fontWeight: '600', fontSize: '1.5rem', marginBottom: '5px', color: '#090'}}>Available Now</p>
+              <p style={{fontWeight: '300', fontSize: '0.875rem', color: '#090'}}>13:00 - 15:00 - Currently 13:20</p>
+            </Box>
+            <Box sx={{display: 'flex', backgroundColor: '#f9fbfd', borderBottom: '1px solid #edf2f6', padding: '30px 0', boxShadow: "10px 0 5px -5px rgba(103, 162, 206, 0.1) inset"}}>
+              <Box sx={{width: '50%', padding: '0 35px'}}>
+                <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', marginBottom: '5px'}}>Custom Availability</p>
+                <p style={{color: '#889ab1', fontWeight: '300', fontSize: '0.875rem'}}>Asset availability runs off the site opening times and exemptions unless you set custom availability.</p>
+              </Box>
+              <Box sx={{width: '50%', padding: '0 25px'}}>
+                <AddButton sx={{width: '100%'}}>Add Custom Availability</AddButton>
+              </Box>
+            </Box>
+            <Box sx={{borderBottom: '1px solid #edf2f6', padding: '35px'}}>
+              <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.5rem', marginBottom: '5px'}}>Custom Opening Times</p>
+              <p style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem'}}>1st January - 1st January</p>
+            </Box>
+            <Box sx={{borderBottom: '1px solid #edf2f6', padding: '35px'}}>
+              <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem'}}>Daily Opening Times</p>
+            </Box>
+            <Box sx={{display: 'flex', justifyContent: 'space-between', padding: '15px 0', borderBottom: '1px solid #edf2f6'}}>
+              <p style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', padding: '0 35px', minWidth: '150px', width: '100%'}}>Day</p>
+              <p style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', padding: '0 35px', minWidth: '150px'}}>Start</p>
+              <p style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', padding: '0 35px', minWidth: '150px'}}>End</p>
+            </Box>
+            <Box sx={{display: 'flex', justifyContent: 'space-between', padding: '25px 0', borderBottom: '1px dotted #edf2f6'}}>
+              <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', padding: '0 35px', minWidth: '150px', width: '100%'}}>Monday</p>
+              <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', padding: '0 35px', minWidth: '150px'}}>12:00 AM</p>
+              <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', padding: '0 35px', minWidth: '150px'}}>11:59 PM</p>
+            </Box>
+            <Box sx={{display: 'flex', justifyContent: 'space-between', padding: '25px 0', borderBottom: '1px dotted #edf2f6'}}>
+              <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', padding: '0 35px', minWidth: '150px', width: '100%'}}>Tuesday</p>
+              <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', padding: '0 35px', minWidth: '150px'}}>12:00 AM</p>
+              <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', padding: '0 35px', minWidth: '150px'}}>11:59 PM</p>
+            </Box>
+            <Box sx={{display: 'flex', justifyContent: 'space-between', padding: '25px 0', borderBottom: '1px dotted #edf2f6'}}>
+              <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', padding: '0 35px', minWidth: '150px', width: '100%'}}>Wednesday</p>
+              <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', padding: '0 35px', minWidth: '150px'}}>12:00 AM</p>
+              <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', padding: '0 35px', minWidth: '150px'}}>11:59 PM</p>
+            </Box>
+            <Box sx={{display: 'flex', justifyContent: 'space-between', padding: '25px 0', borderBottom: '1px dotted #edf2f6'}}>
+              <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', padding: '0 35px', minWidth: '150px', width: '100%'}}>Thursday</p>
+              <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', padding: '0 35px', minWidth: '150px'}}>12:00 AM</p>
+              <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', padding: '0 35px', minWidth: '150px'}}>11:59 PM</p>
+            </Box>
+            <Box sx={{display: 'flex', justifyContent: 'space-between', padding: '25px 0', borderBottom: '1px dotted #edf2f6'}}>
+              <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', padding: '0 35px', minWidth: '150px', width: '100%'}}>Friday</p>
+              <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', padding: '0 35px', minWidth: '150px'}}>12:00 AM</p>
+              <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', padding: '0 35px', minWidth: '150px'}}>11:59 PM</p>
+            </Box>
+            <Box sx={{display: 'flex', justifyContent: 'space-between', padding: '25px 0', borderBottom: '1px dotted #edf2f6'}}>
+              <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', padding: '0 35px', minWidth: '150px', width: '100%'}}>Saturday</p>
+              <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', padding: '0 35px', minWidth: '150px'}}>12:00 AM</p>
+              <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', padding: '0 35px', minWidth: '150px'}}>11:59 PM</p>
+            </Box>
+            <Box sx={{display: 'flex', justifyContent: 'space-between', padding: '25px 0', borderBottom: '1px dotted #edf2f6'}}>
+              <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', padding: '0 35px', minWidth: '150px', width: '100%'}}>Sunday</p>
+              <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', padding: '0 35px', minWidth: '150px'}}>12:00 AM</p>
+              <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', padding: '0 35px', minWidth: '150px'}}>11:59 PM</p>
+            </Box>
+            <Box sx={{textAlign: 'center', padding: '20px', borderBottom: '1px solid #edf2f6'}}>
+              <IconButton onClick={() => alert('pressed')}>
+                <EditIcon/>
+              </IconButton>
+            </Box>
+            <Box sx={{borderBottom: '1px solid #edf2f6', padding: '35px'}}>
+              <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem'}}>Breaks</p>
+            </Box>
+            <Box sx={{borderBottom: '1px solid #edf2f6', padding: '20px'}}>
+              <AddButton sx={{width: '100%'}}>Add Custom Availability</AddButton>
+            </Box>
+            <Box sx={{display: 'flex', justifyContent: 'space-between', padding: '30px', borderBottom: '1px solid #edf2f6'}}>
+              <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', paddingRight: '30px', borderRight: '1px solid #edf2f6'}}>
+                <Box sx={{width: '100%'}}>
+                  <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', marginBottom: '5px', textOverflow: 'ellipsis', overflow: 'hidden'}}>Custom Break</p>
+                  <p style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem'}}>12:00 PM:00 - 01:00 PM / Every day</p>
+                </Box>
+              </Box>
+              <IconButton sx={{alignSelf: 'center', alignItems: 'center', justifyContent: 'center', marginLeft: '30px'}} onClick={() => alert('pressed')}>
+                <EditIcon/>
+              </IconButton>
+            </Box>
+            <Box sx={{borderBottom: '1px solid #edf2f6', padding: '35px'}}>
+              <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.5rem', marginBottom: '5px'}}>Exemptions</p>
+              <p style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem'}}>Create periods either open or closed overriding all opening times.</p>
+            </Box>
+            <Box sx={{borderBottom: '1px solid #edf2f6', padding: '20px'}}>
+              <AddButton sx={{width: '100%'}}>Add Exemptions</AddButton>
+            </Box>
+          </Box>
+        </Box>
+      )
+    }
+  }
   return (
     <>
       <Box sx={{
@@ -370,65 +704,205 @@ function MobileCrane() {
       </Box>
       <Box sx={{display: 'flex', width: '100%'}}>
         <Box sx={{
-            width: 415,
-            maxWidth: 415,
-            height: '100%',
-            paddingBottom: '100px',
-            boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)', 
-            zIndex: 5,
-          }}
-        ></Box>
-        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', height: '100%', minWidth: '500px'}}>
+          overflow: 'auto',
+          width: 415,
+          maxWidth: 415,
+          height: '100%',
+          boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)',
+        }}
+        >
           <Box sx={{
+            padding: '30px',
+            borderBottom: 1,
+            borderBottomColor: '#edf2f6',
+          }}>
+            <Box sx={{
+              minHeight: '215px',
+              borderRadius: '3px',
+              border: 1,
+              borderColor: '#edf2f6',
+              backgroundColor: '#f9fbfd',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'space-between',
-              top: 0,
-              width: '100%',
-              height: '75px',
-              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)', 
-              zIndex: 5,
-              padding : '10px 50px',
-            }}
-          >
-            <Typography>Mobile Crane Info</Typography>
+              justifyContent: 'center',
+              marginBottom: '25px'
+            }}>
+              <img style={{width: '32px', height: '32px', filter: "invert(36%) sepia(18%) saturate(535%) hue-rotate(175deg) brightness(94%) contrast(93%)"}} src={require("../../icons/mcrane.png")} alt="Crane"/>
+            </Box>
+            <Box sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              textAlign: 'center',
+            }}>
+              <Typography sx={{color: '#505e71', fontWeight: 300, fontSize: '1.5rem'}}>{assetName ? assetName : 'N/A'}</Typography>
+            </Box>
           </Box>
-          <Box sx={{display: 'flex', flexDirection: 'column', height: 'calc(100% - 75px)'}}>
-            <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between', borderBottom: 2, borderColor: '#edf2f6', padding: '20px' }}>
-              <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', justifyContent: 'center', padding: '10px 20px'}}>
-                <Typography sx={{fontSize: 18, color: '#808080', fontWeight: '300'}}>Name</Typography>
-                <Typography sx={{fontSize: 24, color: '#808080'}}>{assetName ? assetName : 'N/A'}</Typography>
-              </Box>
-              <Box sx={{ display: 'flex', width: '100px', borderLeft: 2, borderColor: '#edf2f6', alignItems: 'center', justifyContent: 'center'}}>
-                <IconButton onClick={() => {handleOpenSetName()}}>
-                  <EditIcon sx={{color: '#808080'}}/>
-                </IconButton>
-              </Box>
-            </Box>
-            <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between', borderBottom: 2, borderColor: '#edf2f6', padding: '20px' }}>
-              <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', justifyContent: 'center', padding: '10px 20px'}}>
-                <Typography sx={{fontSize: 18, color: '#808080', fontWeight: '300'}}>Make & Model</Typography>
-                <Typography sx={{fontSize: 24, color: '#808080'}}>{assetMake ? assetMake : 'N/A'} - {assetModel ? assetModel : 'N/A'}</Typography>
-              </Box>
-              <Box sx={{ display: 'flex', width: '100px', borderLeft: 2, borderColor: '#edf2f6', alignItems: 'center', justifyContent: 'center'}}>
-                <IconButton onClick={() => handleOpenSetMakeModel()}>
-                  <EditIcon sx={{color: '#808080'}}/>
-                </IconButton>
-              </Box>
-            </Box>
-            <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between', borderBottom: 2, borderColor: '#edf2f6', padding: '20px' }}>
-              <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', justifyContent: 'center', padding: '10px 20px'}}>
-                <Typography sx={{fontSize: 18, color: '#808080', fontWeight: '300'}}>Supplier</Typography>
-                <Typography sx={{fontSize: 24, color: '#808080'}}>{assetSupplier ? assetSupplier : 'N/A' }</Typography>
-              </Box>
-              <Box sx={{ display: 'flex', width: '100px', borderLeft: 2, borderColor: '#edf2f6', alignItems: 'center', justifyContent: 'center'}}>
-                <IconButton>
-                  <EditIcon sx={{color: '#808080'}}/>
-                </IconButton>
-              </Box>
-            </Box>
+          <Box sx={{
+            display: 'flex',
+            padding: '15px 20px',
+            borderBottom: 1,
+            borderBottomColor: '#edf2f6'
+          }}>
+            <Typography sx={{display: 'inline-block', fontWeight: 300, fontSize: '0.875rem', color: '#889ab1'}}>Crane Settings</Typography>
+          </Box>
+          <Box display="block">
+            <AntTabs
+              orientation='vertical'
+              value={tabIndex}
+              onChange={handleChange}
+              TabIndicatorProps={{
+                sx: {
+                  left: 5,
+                  width: 5,
+                  borderRadius: 2,
+                },
+                style: {
+                  backgroundColor: '#0f72bd',
+                }
+              }}
+              sx={{height: '100%'}}
+              scrollButtons={false}
+            >
+              <AntTab value="1" label={
+                  <React.Fragment>
+                    <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <img style={{width: '32px', height: '32px'}} src={require("../../icons/mcrane.png")} alt="Crane"/>
+                        <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
+                        <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Mobile Cranes Info</Typography>
+                      </Box>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <ChevronRight/>
+                      </Box>
+                    </Box>
+                  </React.Fragment>
+                }
+              />
+              <AntTab value="2" label={
+                  <React.Fragment>
+                    <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <img style={{width: '32px', height: '32px'}} src={require("../../icons/pin.png")} alt="Location"/>
+                        <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
+                        <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Location</Typography>
+                      </Box>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <ChevronRight/>
+                      </Box>
+                    </Box>
+                  </React.Fragment>
+                }
+              />
+              <AntTab value="3" label={
+                  <React.Fragment>
+                    <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <img style={{width: '32px', height: '32px'}} src={require("../../icons/crane.png")} alt="Grid"/>
+                        <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
+                        <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Tower Cranes</Typography>
+                      </Box>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <ChevronRight/>
+                      </Box>
+                    </Box>
+                  </React.Fragment>
+                }
+              />
+              <AntTab value="4" label={
+                  <React.Fragment>
+                    <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <img style={{width: '32px', height: '32px'}} src={require("../../icons/platform.png")} alt="Delivery Bays"/>
+                        <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
+                        <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Loading Platforms</Typography>
+                      </Box>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <ChevronRight/>
+                      </Box>
+                    </Box>
+                  </React.Fragment>
+                }
+              />
+              <AntTab value="5" label={
+                  <React.Fragment>
+                    <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <img style={{width: '32px', height: '32px'}} src={require("../../icons/truck.png")} alt="Loading Platforms"/>
+                        <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
+                        <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Delivery Bays</Typography>
+                      </Box>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <ChevronRight/>
+                      </Box>
+                    </Box>
+                  </React.Fragment>
+                }
+              />
+              <AntTab value="6" label={
+                  <React.Fragment>
+                    <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <img style={{width: '32px', height: '32px'}} src={require("../../icons/elevator.png")} alt="Mobile Cranes"/>
+                        <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
+                        <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Hoists</Typography>
+                      </Box>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <ChevronRight/>
+                      </Box>
+                    </Box>
+                  </React.Fragment>
+                }
+              />
+              <AntTab value="7" label={
+                  <React.Fragment>
+                    <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <img style={{width: '32px', height: '32px'}} src={require("../../icons/lifter.png")} alt="Hoist"/>
+                        <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
+                        <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Material Handling</Typography>
+                      </Box>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <ChevronRight/>
+                      </Box>
+                    </Box>
+                  </React.Fragment>
+                }
+              />
+              <AntTab value="8" label={
+                  <React.Fragment>
+                    <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <img style={{width: '32px', height: '32px'}} src={require("../../icons/concrete-truck.png")} alt="Material Handling"/>
+                        <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
+                        <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Concrete Pumps</Typography>
+                      </Box>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <ChevronRight/>
+                      </Box>
+                    </Box>
+                  </React.Fragment>
+                }
+              />
+              <AntTab value="9" label={
+                  <React.Fragment>
+                    <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <img style={{width: '32px', height: '32px'}} src={require("../../icons/calendar.png")} alt="Concrete Pumps"/>
+                        <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
+                        <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Availability</Typography>
+                      </Box>
+                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                        <ChevronRight/>
+                      </Box>
+                    </Box>
+                  </React.Fragment>
+                }
+              />
+            </AntTabs>
           </Box>
         </Box>
+        {tabView()}
       </Box>
       <Modal
         open={open}

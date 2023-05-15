@@ -29,6 +29,9 @@
     --red-color: #cc0000;
     --purple-color: #cc0099
 }
+::-webkit-scrollbar {
+    display:none;
+}
 .container {
     justify-content: space-between;
     overflow: hidden;
