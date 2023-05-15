@@ -555,7 +555,7 @@ function BuildingHoist() {
               <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem'}}>Breaks</p>
             </Box>
             <Box sx={{borderBottom: '1px solid #edf2f6', padding: '20px'}}>
-              <AddButton sx={{width: '100%'}}>Add Custom Availability</AddButton>
+              <AddButton sx={{width: '100%'}}>Add Break Time</AddButton>
             </Box>
             <Box sx={{display: 'flex', justifyContent: 'space-between', padding: '30px', borderBottom: '1px solid #edf2f6'}}>
               <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', paddingRight: '30px', borderRight: '1px solid #edf2f6'}}>

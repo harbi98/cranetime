@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import '../../Style.css';
-import { Box, Typography, Button, Modal, TextField, IconButton, Autocomplete, Tab, Tabs } from '@mui/material';
+import { Box, Typography, Button, Modal, TextField, IconButton, Autocomplete, Tab, Tabs, InputAdornment } from '@mui/material';
 import axios from 'axios';
 import { styled } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
 import ChevronRight from '@mui/icons-material/ChevronRight';
 import EditIcon from '@mui/icons-material/Edit';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import ReplayIcon from '@mui/icons-material/Replay';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import ControlPointIcon from '@mui/icons-material/ControlPoint';
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 
 const AddButton = styled(Button)({
   borderRadius: 3,
@@ -39,10 +44,7 @@ const AddButton = styled(Button)({
     boxShadow: 'none',
     backgroundColor: '#0f72bd',
     borderColor: '#0f72bd',
-  },
-  '&:focus': {
-    boxShadow: '0 0 0 0.2rem rgba(0,123,255,.5)',
-  },
+  }
 });
 const CancelButton = styled(Button)({
   borderRadius: 3,
@@ -78,6 +80,36 @@ const CancelButton = styled(Button)({
   },
   '&:focus': {
     boxShadow: '0 0 0 0.2rem rgba(0,123,255,.5)',
+  },
+});
+const ReloadButton = styled(Button)({
+  padding: '0',
+  width: '60px',
+  height: '60px',
+  border: '1px solid #edf2f6',
+  color: '#8897aa',
+  fontFamily: [
+    '-apple-system',
+    'BlinkMacSystemFont',
+    '"Segoe UI"',
+    'Roboto',
+    '"Helvetica Neue"',
+    'Arial',
+    'sans-serif',
+    '"Apple Color Emoji"',
+    '"Segoe UI Emoji"',
+    '"Segoe UI Symbol"',
+  ].join(','),
+  '&:hover': {
+    backgroundColor: '#004f8a',
+    borderColor: '#004f8a',
+    boxShadow: 'none',
+    color: '#ffff'
+  },
+  '&:active': {
+    boxShadow: 'none',
+    backgroundColor: '#0f72bd',
+    borderColor: '#0f72bd',
   },
 });
 const ListButton = styled(Button)({
@@ -203,6 +235,14 @@ function TowerCrane() {
   const [openSetMakeModel, setOpenSetMakeModel] = useState(false);
   const handleOpenSetMakeModel = () => setOpenSetMakeModel(true);
   const handleCloseSetMakeModel = () => setOpenSetMakeModel(false);
+
+  const [openAddExemption, setOpenAddExemption] = useState(false);
+  const handleOpenAddExemption = () => setOpenAddExemption(true);
+  const handleCloseAddExemption = () => setOpenAddExemption(false);
+
+  const [openAddBreaktime, setOpenAddBreaktime] = useState(false);
+  const handleOpenAddBreaktime = () => setOpenAddBreaktime(true);
+  const handleCloseAddBreaktime = () => setOpenAddBreaktime(false);
 
   const showAssets = () => {
     const headers = {
@@ -628,8 +668,14 @@ function TowerCrane() {
                 <p style={{color: '#889ab1', fontWeight: '300', fontSize: '0.875rem'}}>Asset availability runs off the site opening times and exemptions unless you set custom availability.</p>
               </Box>
               <Box sx={{width: '50%', padding: '0 25px'}}>
-                <AddButton sx={{width: '100%'}}>Add Custom Availability</AddButton>
+                <AddButton sx={{width: '100%'}} onClick={() => handleOpenAddExemption()}>Add Custom Availability</AddButton>
               </Box>
+            </Box>
+            <Box sx={{borderBottom: '1px solid #edf2f6', padding: '35px'}}>
+              <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem'}}>Breaks</p>
+            </Box>
+            <Box sx={{borderBottom: '1px solid #edf2f6', padding: '20px'}}>
+              <AddButton sx={{width: '100%'}} onClick={() => handleOpenAddBreaktime()}>Add Break Time</AddButton>
             </Box>
             <Box sx={{borderBottom: '1px solid #edf2f6', padding: '35px'}}>
               <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.5rem', marginBottom: '5px'}}>Exemptions</p>
@@ -920,8 +966,8 @@ function TowerCrane() {
         open={open}
       >
         <Box sx={style}>
-          <Box borderBottom={2} borderColor='#e0e0e0' sx={{display: 'flex', width: '100%', height: '75px', justifyContent: 'flex-end', padding: '10px'}}>
-            <IconButton onClick={() => handleClose()}>
+          <Box sx={{display: 'flex', borderBottom: '1px solid #edf2f6', width: '100%', height: '75px', justifyContent: 'flex-end', padding: '10px'}}>
+            <IconButton sx={{alignSelf: 'center'}} onClick={() => handleClose()}>
               <CloseIcon/>
             </IconButton>
           </Box>
@@ -967,8 +1013,8 @@ function TowerCrane() {
         open={openSetName}
       >
         <Box sx={style}>
-          <Box borderBottom={2} borderColor='#e0e0e0' sx={{display: 'flex', width: '100%', height: '75px', justifyContent: 'flex-end', padding: '10px'}}>
-            <IconButton onClick={() => handleCloseSetName()}>
+          <Box sx={{display: 'flex', borderBottom: '1px solid #edf2f6', width: '100%', height: '75px', justifyContent: 'flex-end', padding: '10px'}}>
+            <IconButton sx={{alignSelf: 'center'}} onClick={() => handleCloseSetName()}>
               <CloseIcon/>
             </IconButton>
           </Box>
@@ -993,8 +1039,8 @@ function TowerCrane() {
         open={openSetType}
       >
         <Box sx={style}>
-          <Box borderBottom={2} borderColor='#e0e0e0' sx={{display: 'flex', width: '100%', height: '75px', justifyContent: 'flex-end', padding: '10px'}}>
-            <IconButton onClick={() => handleCloseSetType()}>
+          <Box sx={{display: 'flex', borderBottom: '1px solid #edf2f6', width: '100%', height: '75px', justifyContent: 'flex-end', padding: '10px'}}>
+            <IconButton sx={{alignSelf: 'center'}} onClick={() => handleCloseSetType()}>
               <CloseIcon/>
             </IconButton>
           </Box>
@@ -1028,8 +1074,8 @@ function TowerCrane() {
         open={openSetMakeModel}
       >
         <Box sx={style}>
-          <Box borderBottom={2} borderColor='#e0e0e0' sx={{display: 'flex', width: '100%', height: '75px', justifyContent: 'flex-end', padding: '10px'}}>
-            <IconButton onClick={() => handleCloseSetMakeModel()}>
+          <Box sx={{display: 'flex', borderBottom: '1px solid #edf2f6', width: '100%', height: '75px', justifyContent: 'flex-end', padding: '10px'}}>
+            <IconButton sx={{alignSelf: 'center'}} onClick={() => handleCloseSetMakeModel()}>
               <CloseIcon/>
             </IconButton>
           </Box>
@@ -1053,6 +1099,170 @@ function TowerCrane() {
                   <CancelButton sx={{width: '360px', height: '75px'}} onClick={() => handleCloseSetMakeModel()}>Cancel</CancelButton>
                 </Box>
               </Box>
+          </Box>
+        </Box>
+      </Modal>
+      <Modal
+        open={openAddExemption}
+      >
+        <Box sx={style}>
+          <Box sx={{display: 'flex', borderBottom: '1px solid #edf2f6', width: '100%', height: '75px', justifyContent: 'flex-end', padding: '10px'}}>
+            <IconButton sx={{alignSelf: 'center'}} onClick={() => handleCloseAddExemption()}>
+              <CloseIcon/>
+            </IconButton>
+          </Box>
+          <Box sx={{padding: '70px 25px'}}>
+            <Box sx={{maxWidth: '650px', margin: 'auto'}}>
+              <h3 style={{textAlign: 'center', color: '#505e71', fontWeight: '600', fontSize: '2.125rem', marginBottom: '55px'}}>Set Custom Opening Times</h3>
+              <Box style={{margin: 'auto', maxWidth: '640px'}}>
+                <Box sx={{marginBottom: '15px'}}>
+                  <span style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875', marginBottom: '5px'}}>Period Description</span>
+                  <TextField sx={{width: '100%', height: '60px'}}/>
+                </Box>
+                <Box sx={{marginBottom: '15px'}}>
+                  <Box sx={{marginBottom: '15px'}}>
+                    <Box sx={{display: 'flex', margin: '0 -10px'}}>
+                      <Box sx={{flex: 1, margin: '0 10px'}}>
+                        <span style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875', marginBottom: '5px'}}>From</span>
+                        <TextField
+                          sx={{width: '100%', height: '60px'}}
+                          InputProps={{startAdornment: (
+                            <InputAdornment position='start'>
+                              <CalendarTodayIcon/>
+                            </InputAdornment>
+                          )}}
+                        />
+                      </Box>
+                      <Box sx={{flex: 1, margin: '0 10px'}}>
+                        <span style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875', marginBottom: '5px'}}>To</span>
+                        <TextField
+                          sx={{width: '100%', height: '60px'}}
+                          InputProps={{startAdornment: (
+                            <InputAdornment position='start'>
+                              <CalendarTodayIcon/>
+                            </InputAdornment>
+                          )}}
+                        />
+                      </Box>
+                    </Box>
+                  </Box>
+                  <Box sx={{overflow: 'auto'}}>
+                    <Box sx={{marginBottom: '5px', display: 'flex'}}>
+                        <Box sx={{display: 'flex', alignItems: 'center', width: '210px', minWidth: '210px', margin: '0 5px 0 0'}}>
+                          <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                            <span style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem'}}>Open</span>
+                          </Box>
+                        </Box>
+                        <Box sx={{position: 'relative', display: 'flex', alignItems: 'center', flex: 1, margin: '0 0 0 5px'}}>
+                          <Box sx={{flex: 1, margin: '0 5px', minWidth: '58px', maxWidth: '58px'}}>
+                            <span style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem'}}>24hr</span>
+                          </Box>
+                          <Box sx={{position: 'relative', display: 'flex', width: '100%'}}>
+                            <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                              <span style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem'}}>Start</span>
+                            </Box>
+                            <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                              <span style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem'}}>End</span>
+                            </Box>
+                          </Box>
+                        </Box>
+                    </Box>
+                    <Box sx={{display: 'flex', minHeight: '60px', margin: '0 0 10px'}}>
+                      <Box sx={{display: 'flex', alignItems: 'center', width: '210px', minWidth: '210px', margin: '0 5px 0 0'}}>
+                        <input style={{width: '32px', height: '32px'}} type="checkbox"/>
+                        <span style={{fontSize: '1.125rem', color: '#8796aa', paddingLeft: '18px'}}>Monday</span>
+                      </Box>
+                      <Box sx={{position: 'relative', display: 'flex', alignItems: 'center', flex: 1, margin: '0 0 0 5px'}}>
+                        <Box sx={{flex: 1, margin: '0 5px', minWidth: '58px', maxWidth: '58px'}}>
+                          <ReloadButton>
+                            <ReplayIcon/>
+                          </ReloadButton>
+                        </Box>
+                        <Box sx={{position: 'relative', display: 'flex', width: '100%'}}>
+                          <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                            <TextField
+                              sx={{width: '100%', height: '60px'}}
+                              InputProps={{startAdornment: (
+                                <InputAdornment position='start'>
+                                  <AccessTimeIcon/>
+                                </InputAdornment>
+                              )}}
+                            />
+                          </Box>
+                          <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                            <TextField
+                              sx={{width: '100%', height: '60px'}}
+                              InputProps={{startAdornment: (
+                                <InputAdornment position='start'>
+                                  <AccessTimeIcon/>
+                                </InputAdornment>
+                              )}}
+                            />
+                          </Box>
+                        </Box>
+                      </Box>
+                    </Box>
+                  </Box>
+                </Box>
+              </Box>
+              <Box style={{maxWidth: '380px', margin: '70px auto 0'}}>
+                <AddButton sx={{width: '360px', height: '75px', marginBottom: '10px'}} onClick={() => alert('add')}>Update</AddButton>
+                <CancelButton sx={{width: '360px', height: '75px'}} onClick={() => handleCloseAddExemption()}>Cancel</CancelButton>
+              </Box>
+            </Box>
+          </Box>
+        </Box>
+      </Modal>
+      <Modal
+        open={openAddBreaktime}
+      >
+        <Box sx={style}>
+          <Box sx={{display: 'flex', borderBottom: '1px solid #edf2f6', width: '100%', height: '75px', justifyContent: 'flex-end', padding: '10px'}}>
+            <IconButton sx={{alignSelf: 'center'}} onClick={() => handleCloseAddBreaktime()}>
+              <CloseIcon/>
+            </IconButton>
+          </Box>
+          <Box sx={{padding: '70px 25px'}}>
+            <Box sx={{maxWidth: '650px', margin: 'auto'}}>
+              <h3 style={{textAlign: 'center', color: '#505e71', fontWeight: '600', fontSize: '2.125rem', marginBottom: '55px'}}>Set Custom Break Times</h3>
+              <Box style={{margin: 'auto', maxWidth: '640px'}}>
+                <Box sx={{marginBottom: '15px'}}>
+                  <span style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875', marginBottom: '5px'}}>Break Description</span>
+                  <TextField sx={{width: '100%', height: '60px'}}/>
+                </Box>
+                <Box sx={{display: 'flex', alignItems: 'flex-end', margin: '0 -5'}}>
+                  <Box sx={{flex: 1}}>
+                    <TextField
+                      sx={{width: '100%', height: '60px'}}
+                      InputProps={{startAdornment: (
+                        <InputAdornment position='start'>
+                          <AccessTimeIcon/>
+                        </InputAdornment>
+                      )}}
+                    />
+                  </Box>
+                  <Box sx={{flex: 1, margin: '0 5px'}}>
+                    <TextField
+                      sx={{width: '100%', height: '60px'}}
+                      InputProps={{startAdornment: (
+                        <InputAdornment position='start'>
+                          <AccessTimeIcon/>
+                        </InputAdornment>
+                      )}}
+                    />
+                  </Box>
+                  <Box sx={{flex: 1, margin: '0 5px', minWidth: '60px', maxWidth: '60px'}}>
+                    <ReloadButton>
+                      <RemoveCircleOutlineIcon/>
+                    </ReloadButton>
+                  </Box>
+                </Box>
+              </Box>
+              <Box style={{maxWidth: '380px', margin: '70px auto 0'}}>
+                <AddButton sx={{width: '360px', height: '75px', marginBottom: '10px'}} onClick={() => alert('add')}>Update</AddButton>
+                <CancelButton sx={{width: '360px', height: '75px'}} onClick={() => handleCloseAddExemption()}>Cancel</CancelButton>
+              </Box>
+            </Box>
           </Box>
         </Box>
       </Modal>
