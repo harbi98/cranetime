@@ -82,7 +82,7 @@ const CancelButton = styled(Button)({
     boxShadow: '0 0 0 0.2rem rgba(0,123,255,.5)',
   },
 });
-const ReloadButton = styled(Button)({
+const SquareButton = styled(Button)({
   padding: '0',
   width: '60px',
   height: '60px',
@@ -193,10 +193,11 @@ const style = {
   width: '100%',
   height: '100%',
   backgroundColor: 'white',
+  overflowY: 'scroll'
 };
 
 function TowerCrane() {
-  const [tabIndex, setTabIndex] = useState(0);
+  const [tabIndex, setTabIndex] = useState("1");
   const handleChange = (event, newValue) => {
     setTabIndex(newValue);
   };
@@ -218,7 +219,24 @@ function TowerCrane() {
     'Luffer',
     'Hammerhead'
   ];
-  //const [equipmentType, setEquipmentType] = useState();
+  
+  const [breakTimeField, setBreakTimeField] = useState([{time_start: "", time_end: ""}]);
+
+  const handleChangeBreakTime = (i, e) => {
+    let newFormValues = [...breakTimeField];
+    newFormValues[i][e.target.name] = e.target.value;
+    setBreakTimeField(newFormValues);
+  }
+    
+  const addFormFields = () => {
+      setBreakTimeField([...breakTimeField, {time_start: "", time_end: ""}])
+  }
+
+  const removeFormFields = (i) => {
+      let newFormValues = [...breakTimeField];
+      newFormValues.splice(i, 1);
+      setBreakTimeField(newFormValues)
+  }
 
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -1174,9 +1192,9 @@ function TowerCrane() {
                       </Box>
                       <Box sx={{position: 'relative', display: 'flex', alignItems: 'center', flex: 1, margin: '0 0 0 5px'}}>
                         <Box sx={{flex: 1, margin: '0 5px', minWidth: '58px', maxWidth: '58px'}}>
-                          <ReloadButton>
+                          <SquareButton>
                             <ReplayIcon/>
-                          </ReloadButton>
+                          </SquareButton>
                         </Box>
                         <Box sx={{position: 'relative', display: 'flex', width: '100%'}}>
                           <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
@@ -1227,36 +1245,55 @@ function TowerCrane() {
               <h3 style={{textAlign: 'center', color: '#505e71', fontWeight: '600', fontSize: '2.125rem', marginBottom: '55px'}}>Set Custom Break Times</h3>
               <Box style={{margin: 'auto', maxWidth: '640px'}}>
                 <Box sx={{marginBottom: '15px'}}>
-                  <span style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875', marginBottom: '5px'}}>Break Description</span>
+                  <span style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', marginBottom: '5px'}}>Break Description</span>
                   <TextField sx={{width: '100%', height: '60px'}}/>
                 </Box>
-                <Box sx={{display: 'flex', alignItems: 'flex-end', margin: '0 -5'}}>
-                  <Box sx={{flex: 1}}>
-                    <TextField
-                      sx={{width: '100%', height: '60px'}}
-                      InputProps={{startAdornment: (
-                        <InputAdornment position='start'>
-                          <AccessTimeIcon/>
-                        </InputAdornment>
-                      )}}
-                    />
-                  </Box>
-                  <Box sx={{flex: 1, margin: '0 5px'}}>
-                    <TextField
-                      sx={{width: '100%', height: '60px'}}
-                      InputProps={{startAdornment: (
-                        <InputAdornment position='start'>
-                          <AccessTimeIcon/>
-                        </InputAdornment>
-                      )}}
-                    />
-                  </Box>
-                  <Box sx={{flex: 1, margin: '0 5px', minWidth: '60px', maxWidth: '60px'}}>
-                    <ReloadButton>
-                      <RemoveCircleOutlineIcon/>
-                    </ReloadButton>
-                  </Box>
-                </Box>
+                {breakTimeField.map((element, index) => {
+                  return (
+                    <Box sx={{display: 'flex', alignItems: 'flex-end', margin: '5px 0'}}>
+                      <Box sx={{flex: 1}}>
+                        <span style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', marginBottom: '5px'}}>Time Start</span>
+                        <TextField
+                          sx={{width: '100%', height: '60px'}}
+                          InputProps={{startAdornment: (
+                            <InputAdornment position='start'>
+                              <AccessTimeIcon/>
+                            </InputAdornment>
+                          )}}
+                        />
+                      </Box>
+                      <Box sx={{flex: 1, margin: '0 5px'}}>
+                        <span style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', marginBottom: '5px'}}>Time End</span>
+                        <TextField
+                          sx={{width: '100%', height: '60px'}}
+                          InputProps={{startAdornment: (
+                            <InputAdornment position='start'>
+                              <AccessTimeIcon/>
+                            </InputAdornment>
+                          )}}
+                        />
+                      </Box>
+                      {index ? 
+                        <Box sx={{flex: 1, margin: '0 5px', minWidth: '60px', maxWidth: '60px'}}>
+                          <SquareButton onClick={() => removeFormFields(index)}>
+                            <RemoveCircleOutlineIcon/>
+                          </SquareButton>
+                        </Box>
+                        :
+                        <Box sx={{flex: 1, margin: '0 5px', minWidth: '60px', maxWidth: '60px'}}>
+                          <SquareButton disabled>
+                            <RemoveCircleOutlineIcon/>
+                          </SquareButton>
+                        </Box>
+                      }
+                    </Box>
+                  )
+                })}
+              <Box sx={{display: 'flex', justifyContent: 'flex-end', margin: '15px 0 0 0'}}>
+                <SquareButton onClick={() => addFormFields()}>
+                  <ControlPointIcon/>
+                </SquareButton>
+              </Box>
               </Box>
               <Box style={{maxWidth: '380px', margin: '70px auto 0'}}>
                 <AddButton sx={{width: '360px', height: '75px', marginBottom: '10px'}} onClick={() => alert('add')}>Update</AddButton>
