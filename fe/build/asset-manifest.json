@@ -1,17 +1,24 @@
 {
   "files": {
-    "main.css": "/static/css/main.da6aa69b.css",
-    "main.js": "/static/js/main.e7162b9d.js",
+    "main.css": "/static/css/main.ff5ccfbd.css",
+    "main.js": "/static/js/main.a42be7ef.js",
     "static/js/787.688d19d6.chunk.js": "/static/js/787.688d19d6.chunk.js",
     "static/media/settings_img.jpg": "/static/media/settings_img.ce0b4d0eba8d59f1fe1c.jpg",
     "static/media/login_sidebar_bg.jpg": "/static/media/login_sidebar_bg.bf3057c466e274b28a06.jpg",
+    "static/media/pin.png": "/static/media/pin.8210970acff9062a268b.png",
+    "static/media/concrete-truck.png": "/static/media/concrete-truck.dba22d554d89fd2b3877.png",
+    "static/media/platform.png": "/static/media/platform.3d15808db80c9ae8be6a.png",
+    "static/media/truck.png": "/static/media/truck.fbf2682906c6b56e9ff6.png",
+    "static/media/crane.png": "/static/media/crane.3446b20d5f8da877714b.png",
+    "static/media/lifter.png": "/static/media/lifter.1cdbd89971c4086a45b1.png",
+    "static/media/mcrane.png": "/static/media/mcrane.fdb2499f2a8bb708bffe.png",
     "index.html": "/index.html",
-    "main.da6aa69b.css.map": "/static/css/main.da6aa69b.css.map",
-    "main.e7162b9d.js.map": "/static/js/main.e7162b9d.js.map",
+    "main.ff5ccfbd.css.map": "/static/css/main.ff5ccfbd.css.map",
+    "main.a42be7ef.js.map": "/static/js/main.a42be7ef.js.map",
     "787.688d19d6.chunk.js.map": "/static/js/787.688d19d6.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.da6aa69b.css",
-    "static/js/main.e7162b9d.js"
+    "static/css/main.ff5ccfbd.css",
+    "static/js/main.a42be7ef.js"
   ]
 }

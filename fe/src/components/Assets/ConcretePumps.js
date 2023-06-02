@@ -1,12 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import '../../Style.css';
 import { Box, Typography, Button, Modal, TextField, IconButton, Tab, Tabs } from '@mui/material';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import axios from 'axios';
 import { styled } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
 import ChevronRight from '@mui/icons-material/ChevronRight';
 import EditIcon from '@mui/icons-material/Edit';
+import ReplayIcon from '@mui/icons-material/Replay';
+import ControlPointIcon from '@mui/icons-material/ControlPoint';
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 
 const AddButton = styled(Button)({
   borderRadius: 3,
@@ -78,6 +85,36 @@ const CancelButton = styled(Button)({
   },
   '&:focus': {
     boxShadow: '0 0 0 0.2rem rgba(0,123,255,.5)',
+  },
+});
+const SquareButton = styled(Button)({
+  padding: '0',
+  width: '60px',
+  height: '60px',
+  border: '1px solid #edf2f6',
+  color: '#8897aa',
+  fontFamily: [
+    '-apple-system',
+    'BlinkMacSystemFont',
+    '"Segoe UI"',
+    'Roboto',
+    '"Helvetica Neue"',
+    'Arial',
+    'sans-serif',
+    '"Apple Color Emoji"',
+    '"Segoe UI Emoji"',
+    '"Segoe UI Symbol"',
+  ].join(','),
+  '&:hover': {
+    backgroundColor: '#0f72bd',
+    borderColor: '#0f72bd',
+    boxShadow: 'none',
+    color: '#ffff'
+  },
+  '&:active': {
+    boxShadow: 'none',
+    backgroundColor: '#0f72bd',
+    borderColor: '#0f72bd',
   },
 });
 const ListButton = styled(Button)({
@@ -177,6 +214,71 @@ function BuildingHoist() {
 
   const [customName, setCustomName] = useState();
 
+  const days = [
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+    'Sunday'
+  ]
+
+  const [customAvailability, setCustomAvailability] = useState([]);
+  const [customAvailabilityID, setCustomAvailabilityID] = useState();
+  const [customAvailabilityHours, setCustomAvailabilityHours] = useState([]);
+  const [customAvailabilityName, setCustomAvailabilityName] = useState();
+  const [customDateFrom, setCustomDateFrom] = useState();
+  const [customDateTo, setCustomDateTo] = useState();
+  const [customDays, setCustomDays] = useState([
+    [true, '', ''],
+    [true, '', ''],
+    [true, '', ''],
+    [true, '', ''],
+    [true, '', ''],
+    [true, '', ''],
+    [true, '', ''],
+  ]);
+
+  const [breakTimeName, setBreakTimeName] = useState();
+  const handleChangeCustomDays = (day, e) => {
+    let newFormValues = [...customDays];
+    newFormValues[day][0] = e.target.checked ? true : false;
+    setCustomDays(newFormValues);
+  }
+  const handleChangeCustomDaysTimeStart = (day, e) => {
+    let newFormValues = [...customDays];
+    newFormValues[day][1] = e;
+    setCustomDays(newFormValues);
+  }
+  const handleChangeCustomDaysTimeEnd = (day, e) => {
+    let newFormValues = [...customDays];
+    newFormValues[day][2] = e;
+    setCustomDays(newFormValues);
+  }
+
+  const [breakTimeField, setBreakTimeField] = useState([{time_start: "", time_end: ""}]);
+  const handleChangeBreakTimeStart = (i, e) => {
+    let newFormValues = [...breakTimeField];
+    newFormValues[i]['time_start'] = e;
+    setBreakTimeField(newFormValues);
+  }
+  const handleChangeBreakTimeEnd = (i, e) => {
+    let newFormValues = [...breakTimeField];
+    newFormValues[i]['time_end'] = e;
+    setBreakTimeField(newFormValues);
+  }
+    
+  const addFormFields = () => {
+      setBreakTimeField([...breakTimeField, {time_start: "", time_end: ""}])
+  }
+
+  const removeFormFields = (i) => {
+      let newFormValues = [...breakTimeField];
+      newFormValues.splice(i, 1);
+      setBreakTimeField(newFormValues)
+  }
+
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -184,6 +286,17 @@ function BuildingHoist() {
   const [openSetName, setOpenSetName] = useState(false);
   const handleOpenSetName = () => setOpenSetName(true);
   const handleCloseSetName = () => setOpenSetName(false);
+
+  const [openAddCustomAvailability, setOpenAddCustomAvailability] = useState(false);
+  const handleOpenAddCustomAvailability = () => setOpenAddCustomAvailability(true);
+  const handleCloseAddCustomAvailability = () => setOpenAddCustomAvailability(false);
+
+  const [openAddBreaktime, setOpenAddBreaktime] = useState(false);
+  const handleOpenAddBreaktime = (id) => {
+    setOpenAddBreaktime(true);
+    setCustomAvailabilityID(id);
+  };
+  const handleCloseAddBreaktime = () => setOpenAddBreaktime(false);
 
   const showAssets = () => {
     const headers = {
@@ -463,7 +576,7 @@ function BuildingHoist() {
                 <p style={{color: '#889ab1', fontWeight: '300', fontSize: '0.875rem'}}>Asset availability runs off the site opening times and exemptions unless you set custom availability.</p>
               </Box>
               <Box sx={{width: '50%', padding: '0 25px'}}>
-                <AddButton sx={{width: '100%'}}>Add Custom Availability</AddButton>
+                <AddButton sx={{width: '100%'}} onClick={() => handleOpenAddCustomAvailability()}>Add Custom Availability</AddButton>
               </Box>
             </Box>
             <Box sx={{borderBottom: '1px solid #edf2f6', padding: '35px'}}>
@@ -522,7 +635,7 @@ function BuildingHoist() {
               <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem'}}>Breaks</p>
             </Box>
             <Box sx={{borderBottom: '1px solid #edf2f6', padding: '20px'}}>
-              <AddButton sx={{width: '100%'}}>Add Custom Availability</AddButton>
+              <AddButton sx={{width: '100%'}} onClick={() => handleOpenAddBreaktime()}>Add Breaktime</AddButton>
             </Box>
             <Box sx={{display: 'flex', justifyContent: 'space-between', padding: '30px', borderBottom: '1px solid #edf2f6'}}>
               <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', paddingRight: '30px', borderRight: '1px solid #edf2f6'}}>
@@ -852,6 +965,571 @@ function BuildingHoist() {
                   <CancelButton sx={{width: '360px', height: '75px'}} onClick={() => handleCloseSetName()}>Cancel</CancelButton>
                 </Box>
               </Box>
+          </Box>
+        </Box>
+      </Modal>
+      <Modal
+        open={openAddCustomAvailability}
+      >
+        <Box sx={style}>
+          <Box sx={{display: 'flex', borderBottom: '1px solid #edf2f6', width: '100%', height: '75px', justifyContent: 'flex-end', padding: '10px'}}>
+            <IconButton sx={{alignSelf: 'center'}} onClick={() => handleCloseAddCustomAvailability()}>
+              <CloseIcon/>
+            </IconButton>
+          </Box>
+          <Box sx={{
+            padding: '70px 25px',
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'white',
+            overflowY: 'scroll'
+          }}>
+            <Box sx={{maxWidth: '650px', margin: 'auto'}}>
+              <h3 style={{textAlign: 'center', color: '#505e71', fontWeight: '600', fontSize: '2.125rem', marginBottom: '55px'}}>Set Custom Opening Times</h3>
+              <Box style={{margin: 'auto', maxWidth: '640px'}}>
+                <Box sx={{marginBottom: '15px'}}>
+                  <span style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875', marginBottom: '5px'}}>Period Description</span>
+                  <TextField sx={{width: '100%', height: '60px'}} onChange={(e) => setCustomAvailabilityName(e.target.value)}/>
+                </Box>
+                <Box sx={{marginBottom: '15px'}}>
+                  <Box sx={{marginBottom: '15px'}}>
+                    <Box sx={{display: 'flex', margin: '0 -10px'}}>
+                      <Box sx={{flex: 1, margin: '0 10px'}}>
+                        <span style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875', marginBottom: '5px'}}>From</span>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                          <DatePicker sx={{width: '100%', height: '60px'}} onChange={(e) => setCustomDateFrom(e)}/>
+                        </LocalizationProvider>
+                      </Box>
+                      <Box sx={{flex: 1, margin: '0 10px'}}>
+                        <span style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875', marginBottom: '5px'}}>To</span>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                          <DatePicker sx={{width: '100%', height: '60px'}} onChange={(e) => setCustomDateTo(e)}/>
+                        </LocalizationProvider>
+                      </Box>
+                    </Box>
+                  </Box>
+                  <Box sx={{overflow: 'auto'}}>
+                    <Box sx={{marginBottom: '5px', display: 'flex'}}>
+                        <Box sx={{display: 'flex', alignItems: 'center', width: '210px', minWidth: '210px', margin: '0 5px 0 0'}}>
+                          <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                            <span style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem'}}>Open</span>
+                          </Box>
+                        </Box>
+                        <Box sx={{position: 'relative', display: 'flex', alignItems: 'center', flex: 1, margin: '0 0 0 5px'}}>
+                          <Box sx={{flex: 1, margin: '0 5px', minWidth: '58px', maxWidth: '58px'}}>
+                            <span style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem'}}>24hr</span>
+                          </Box>
+                          <Box sx={{position: 'relative', display: 'flex', width: '100%'}}>
+                            <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                              <span style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem'}}>Start</span>
+                            </Box>
+                            <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                              <span style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem'}}>End</span>
+                            </Box>
+                          </Box>
+                        </Box>
+                    </Box>
+                    <Box sx={{display: 'flex', minHeight: '60px', margin: '0 0 10px'}}>
+                      <Box sx={{display: 'flex', alignItems: 'center', width: '210px', minWidth: '210px', margin: '0 5px 0 0'}}>
+                        <input
+                          style={{width: '32px', height: '32px'}}
+                          type="checkbox"
+                          checked={customDays[0][0] ? true : false}
+                          onChange={(e) => handleChangeCustomDays(0, e)}
+                        />
+                        <span style={{fontSize: '1.125rem', color: '#8796aa', paddingLeft: '18px'}}>Monday</span>
+                      </Box>
+                      <Box sx={{position: 'relative', display: 'flex', alignItems: 'center', flex: 1, margin: '0 0 0 5px'}}>
+                        {customDays[0][0] ?
+                          <>
+                            <Box sx={{flex: 1, margin: '0 5px', minWidth: '58px', maxWidth: '58px'}}>
+                              <SquareButton>
+                                <ReplayIcon/>
+                              </SquareButton>
+                            </Box>
+                            <Box sx={{position: 'relative', display: 'flex', width: '100%'}}>
+                              <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                  <TimePicker
+                                    value={customDays[0][1]}
+                                    onChange={(e) => handleChangeCustomDaysTimeStart(0, e)}
+                                  />
+                                </LocalizationProvider>
+                              </Box>
+                              <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                  <TimePicker
+                                    value={customDays[0][2]}
+                                    onChange={(e) => handleChangeCustomDaysTimeEnd(0, e)}
+                                  />
+                                </LocalizationProvider>
+                              </Box>
+                            </Box>
+                          </>
+                        :
+                          <div style={{
+                            position: 'absolute',
+                            top: 0,
+                            bottom: 0,
+                            left: '5px',
+                            right: '5px',
+                            padding: '0 10px',
+                            textAlign: 'center',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderRadius: '3px',
+                            border: '1px solid #edf2f6',
+                            backgroundImage: `url(${require("../../images/update_bg.jpg")})`,
+                            backgroundRepeat: 'repeat',
+                          }}>
+                            <p style={{color: '#8796aa', fontWeight: '300', fontSize: '0.875rem'}}>Day Set To Closed</p>
+                          </div>
+                        }
+                      </Box>
+                    </Box>
+                    <Box sx={{display: 'flex', minHeight: '60px', margin: '0 0 10px'}}>
+                      <Box sx={{display: 'flex', alignItems: 'center', width: '210px', minWidth: '210px', margin: '0 5px 0 0'}}>
+                        <input
+                          style={{width: '32px', height: '32px'}}
+                          type="checkbox"
+                          checked={customDays[1][0] ? true : false}
+                          onChange={(e) => handleChangeCustomDays(1, e)}
+                        />
+                        <span style={{fontSize: '1.125rem', color: '#8796aa', paddingLeft: '18px'}}>Tuesday</span>
+                      </Box>
+                      <Box sx={{position: 'relative', display: 'flex', alignItems: 'center', flex: 1, margin: '0 0 0 5px'}}>
+                        {customDays[1][0] ?
+                          <>
+                            <Box sx={{flex: 1, margin: '0 5px', minWidth: '58px', maxWidth: '58px'}}>
+                              <SquareButton>
+                                <ReplayIcon/>
+                              </SquareButton>
+                            </Box>
+                            <Box sx={{position: 'relative', display: 'flex', width: '100%'}}>
+                              <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                  <TimePicker
+                                    value={customDays[1][1]}
+                                    onChange={(e) => handleChangeCustomDaysTimeStart(1, e)}
+                                  />
+                                </LocalizationProvider>
+                              </Box>
+                              <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                  <TimePicker
+                                    value={customDays[1][2]}
+                                    onChange={(e) => handleChangeCustomDaysTimeEnd(1, e)}
+                                  />
+                                </LocalizationProvider>
+                              </Box>
+                            </Box>
+                          </>
+                        :
+                          <div style={{
+                            position: 'absolute',
+                            top: 0,
+                            bottom: 0,
+                            left: '5px',
+                            right: '5px',
+                            padding: '0 10px',
+                            textAlign: 'center',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderRadius: '3px',
+                            border: '1px solid #edf2f6',
+                            backgroundImage: `url(${require("../../images/update_bg.jpg")})`,
+                            backgroundRepeat: 'repeat',
+                          }}>
+                            <p style={{color: '#8796aa', fontWeight: '300', fontSize: '0.875rem'}}>Day Set To Closed</p>
+                          </div>
+                        }
+                      </Box>
+                    </Box>
+                    <Box sx={{display: 'flex', minHeight: '60px', margin: '0 0 10px'}}>
+                      <Box sx={{display: 'flex', alignItems: 'center', width: '210px', minWidth: '210px', margin: '0 5px 0 0'}}>
+                        <input
+                          style={{width: '32px', height: '32px'}}
+                          type="checkbox"
+                          checked={customDays[2][0] ? true : false}
+                          onChange={(e) => handleChangeCustomDays(2, e)}
+                        />
+                        <span style={{fontSize: '1.125rem', color: '#8796aa', paddingLeft: '18px'}}>Wednesday</span>
+                      </Box>
+                      <Box sx={{position: 'relative', display: 'flex', alignItems: 'center', flex: 1, margin: '0 0 0 5px'}}>
+                        {customDays[2][0] ?
+                          <>
+                            <Box sx={{flex: 1, margin: '0 5px', minWidth: '58px', maxWidth: '58px'}}>
+                              <SquareButton>
+                                <ReplayIcon/>
+                              </SquareButton>
+                            </Box>
+                            <Box sx={{position: 'relative', display: 'flex', width: '100%'}}>
+                              <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                  <TimePicker
+                                    value={customDays[2][1]}
+                                    onChange={(e) => handleChangeCustomDaysTimeStart(2, e)}
+                                  />
+                                </LocalizationProvider>
+                              </Box>
+                              <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                  <TimePicker
+                                    value={customDays[2][2]}
+                                    onChange={(e) => handleChangeCustomDaysTimeEnd(2, e)}
+                                  />
+                                </LocalizationProvider>
+                              </Box>
+                            </Box>
+                          </>
+                        :
+                          <div style={{
+                            position: 'absolute',
+                            top: 0,
+                            bottom: 0,
+                            left: '5px',
+                            right: '5px',
+                            padding: '0 10px',
+                            textAlign: 'center',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderRadius: '3px',
+                            border: '1px solid #edf2f6',
+                            backgroundImage: `url(${require("../../images/update_bg.jpg")})`,
+                            backgroundRepeat: 'repeat',
+                          }}>
+                            <p style={{color: '#8796aa', fontWeight: '300', fontSize: '0.875rem'}}>Day Set To Closed</p>
+                          </div>
+                        }
+                      </Box>
+                    </Box>
+                    <Box sx={{display: 'flex', minHeight: '60px', margin: '0 0 10px'}}>
+                      <Box sx={{display: 'flex', alignItems: 'center', width: '210px', minWidth: '210px', margin: '0 5px 0 0'}}>
+                        <input
+                          style={{width: '32px', height: '32px'}}
+                          type="checkbox"
+                          checked={customDays[3][0] ? true : false}
+                          onChange={(e) => handleChangeCustomDays(3, e)}
+                        />
+                        <span style={{fontSize: '1.125rem', color: '#8796aa', paddingLeft: '18px'}}>Thursday</span>
+                      </Box>
+                      <Box sx={{position: 'relative', display: 'flex', alignItems: 'center', flex: 1, margin: '0 0 0 5px'}}>
+                        {customDays[3][0] ?
+                          <>
+                            <Box sx={{flex: 1, margin: '0 5px', minWidth: '58px', maxWidth: '58px'}}>
+                              <SquareButton>
+                                <ReplayIcon/>
+                              </SquareButton>
+                            </Box>
+                            <Box sx={{position: 'relative', display: 'flex', width: '100%'}}>
+                              <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                  <TimePicker
+                                    value={customDays[3][1]}
+                                    onChange={(e) => handleChangeCustomDaysTimeStart(3, e)}
+                                  />
+                                </LocalizationProvider>
+                              </Box>
+                              <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                  <TimePicker
+                                    value={customDays[3][2]}
+                                    onChange={(e) => handleChangeCustomDaysTimeEnd(3, e)}
+                                  />
+                                </LocalizationProvider>
+                              </Box>
+                            </Box>
+                          </>
+                        :
+                          <div style={{
+                            position: 'absolute',
+                            top: 0,
+                            bottom: 0,
+                            left: '5px',
+                            right: '5px',
+                            padding: '0 10px',
+                            textAlign: 'center',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderRadius: '3px',
+                            border: '1px solid #edf2f6',
+                            backgroundImage: `url(${require("../../images/update_bg.jpg")})`,
+                            backgroundRepeat: 'repeat',
+                          }}>
+                            <p style={{color: '#8796aa', fontWeight: '300', fontSize: '0.875rem'}}>Day Set To Closed</p>
+                          </div>
+                        }
+                      </Box>
+                    </Box>
+                    <Box sx={{display: 'flex', minHeight: '60px', margin: '0 0 10px'}}>
+                      <Box sx={{display: 'flex', alignItems: 'center', width: '210px', minWidth: '210px', margin: '0 5px 0 0'}}>
+                        <input
+                          style={{width: '32px', height: '32px'}}
+                          type="checkbox"
+                          checked={customDays[4][0] ? true : false}
+                          onChange={(e) => handleChangeCustomDays(4, e)}
+                        />
+                        <span style={{fontSize: '1.125rem', color: '#8796aa', paddingLeft: '18px'}}>Friday</span>
+                      </Box>
+                      <Box sx={{position: 'relative', display: 'flex', alignItems: 'center', flex: 1, margin: '0 0 0 5px'}}>
+                        {customDays[4][0] ?
+                          <>
+                            <Box sx={{flex: 1, margin: '0 5px', minWidth: '58px', maxWidth: '58px'}}>
+                              <SquareButton>
+                                <ReplayIcon/>
+                              </SquareButton>
+                            </Box>
+                            <Box sx={{position: 'relative', display: 'flex', width: '100%'}}>
+                              <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                  <TimePicker
+                                    value={customDays[4][1]}
+                                    onChange={(e) => handleChangeCustomDaysTimeStart(4, e)}
+                                  />
+                                </LocalizationProvider>
+                              </Box>
+                              <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                  <TimePicker
+                                    value={customDays[4][2]}
+                                    onChange={(e) => handleChangeCustomDaysTimeEnd(4, e)}
+                                  />
+                                </LocalizationProvider>
+                              </Box>
+                            </Box>
+                          </>
+                        :
+                          <div style={{
+                            position: 'absolute',
+                            top: 0,
+                            bottom: 0,
+                            left: '5px',
+                            right: '5px',
+                            padding: '0 10px',
+                            textAlign: 'center',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderRadius: '3px',
+                            border: '1px solid #edf2f6',
+                            //backgroundImage: `url(${"../../images/update_bg.jpg"})`,
+                            backgroundImage: `url(${require("../../images/update_bg.jpg")})`,
+                            backgroundRepeat: 'repeat',
+                          }}>
+                            <p style={{color: '#8796aa', fontWeight: '300', fontSize: '0.875rem'}}>Day Set To Closed</p>
+                          </div>
+                        }
+                      </Box>
+                    </Box>
+                    <Box sx={{display: 'flex', minHeight: '60px', margin: '0 0 10px'}}>
+                      <Box sx={{display: 'flex', alignItems: 'center', width: '210px', minWidth: '210px', margin: '0 5px 0 0'}}>
+                        <input
+                          style={{width: '32px', height: '32px'}}
+                          type="checkbox"
+                          checked={customDays[5][0] ? true : false}
+                          onChange={(e) => handleChangeCustomDays(5, e)}
+                        />
+                        <span style={{fontSize: '1.125rem', color: '#8796aa', paddingLeft: '18px'}}>Saturday</span>
+                      </Box>
+                      <Box sx={{position: 'relative', display: 'flex', alignItems: 'center', flex: 1, margin: '0 0 0 5px'}}>
+                        {customDays[5][0] ?
+                          <>
+                            <Box sx={{flex: 1, margin: '0 5px', minWidth: '58px', maxWidth: '58px'}}>
+                              <SquareButton>
+                                <ReplayIcon/>
+                              </SquareButton>
+                            </Box>
+                            <Box sx={{position: 'relative', display: 'flex', width: '100%'}}>
+                              <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                  <TimePicker
+                                    value={customDays[5][1]}
+                                    onChange={(e) => handleChangeCustomDaysTimeStart(5, e)}
+                                  />
+                                </LocalizationProvider>
+                              </Box>
+                              <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                  <TimePicker
+                                    value={customDays[5][2]}
+                                    onChange={(e) => handleChangeCustomDaysTimeEnd(5, e)}
+                                  />
+                                </LocalizationProvider>
+                              </Box>
+                            </Box>
+                          </>
+                        :
+                          <div style={{
+                            position: 'absolute',
+                            top: 0,
+                            bottom: 0,
+                            left: '5px',
+                            right: '5px',
+                            padding: '0 10px',
+                            textAlign: 'center',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderRadius: '3px',
+                            border: '1px solid #edf2f6',
+                            //backgroundImage: `url(${"../../images/update_bg.jpg"})`,
+                            backgroundImage: `url(${require("../../images/update_bg.jpg")})`,
+                            backgroundRepeat: 'repeat',
+                          }}>
+                            <p style={{color: '#8796aa', fontWeight: '300', fontSize: '0.875rem'}}>Day Set To Closed</p>
+                          </div>
+                        }
+                      </Box>
+                    </Box>
+                    <Box sx={{display: 'flex', minHeight: '60px', margin: '0 0 10px'}}>
+                      <Box sx={{display: 'flex', alignItems: 'center', width: '210px', minWidth: '210px', margin: '0 5px 0 0'}}>
+                        <input
+                          style={{width: '32px', height: '32px'}}
+                          type="checkbox"
+                          checked={customDays[6][0] ? true : false}
+                          onChange={(e) => handleChangeCustomDays(6, e)}
+                        />
+                        <span style={{fontSize: '1.125rem', color: '#8796aa', paddingLeft: '18px'}}>Sunday</span>
+                      </Box>
+                      <Box sx={{position: 'relative', display: 'flex', alignItems: 'center', flex: 1, margin: '0 0 0 5px'}}>
+                        {customDays[6][0] ?
+                            <>
+                              <Box sx={{flex: 1, margin: '0 5px', minWidth: '58px', maxWidth: '58px'}}>
+                                <SquareButton>
+                                  <ReplayIcon/>
+                                </SquareButton>
+                              </Box>
+                              <Box sx={{position: 'relative', display: 'flex', width: '100%'}}>
+                                <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <TimePicker
+                                      value={customDays[6][1]}
+                                      onChange={(e) => handleChangeCustomDaysTimeStart(6, e)}
+                                    />
+                                  </LocalizationProvider>
+                                </Box>
+                                <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <TimePicker
+                                      value={customDays[6][2]}
+                                      onChange={(e) => handleChangeCustomDaysTimeEnd(6, e)}
+                                    />
+                                  </LocalizationProvider>
+                                </Box>
+                              </Box>
+                            </>
+                          :
+                            <div style={{
+                              position: 'absolute',
+                              top: 0,
+                              bottom: 0,
+                              left: '5px',
+                              right: '5px',
+                              padding: '0 10px',
+                              textAlign: 'center',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              borderRadius: '3px',
+                              border: '1px solid #edf2f6',
+                              //backgroundImage: `url(${"../../images/update_bg.jpg"})`,
+                              backgroundImage: `url(${require("../../images/update_bg.jpg")})`,
+                              backgroundRepeat: 'repeat',
+                            }}>
+                              <p style={{color: '#8796aa', fontWeight: '300', fontSize: '0.875rem'}}>Day Set To Closed</p>
+                            </div>
+                        }
+                      </Box>
+                    </Box>
+                  </Box>
+                </Box>
+              </Box>
+              <Box style={{maxWidth: '380px', margin: '70px auto 0'}}>
+                <AddButton sx={{width: '360px', height: '75px', marginBottom: '10px'}}>Update</AddButton>
+                {/* <AddButton sx={{width: '360px', height: '75px', marginBottom: '10px'}} onClick={() => console.log(customDays)}>Update</AddButton> */}
+                <CancelButton sx={{width: '360px', height: '75px'}} onClick={() => handleCloseAddCustomAvailability()}>Cancel</CancelButton>
+              </Box>
+            </Box>
+          </Box>
+        </Box>
+      </Modal>
+      <Modal
+        open={openAddBreaktime}
+      >
+        <Box sx={style}>
+          <Box sx={{display: 'flex', borderBottom: '1px solid #edf2f6', width: '100%', height: '75px', justifyContent: 'flex-end', padding: '10px'}}>
+            <IconButton sx={{alignSelf: 'center'}} onClick={() => handleCloseAddBreaktime()}>
+              <CloseIcon/>
+            </IconButton>
+          </Box>
+          <Box sx={{
+            padding: '70px 25px',
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'white',
+            overflowY: 'scroll',
+          }}>
+            <Box sx={{maxWidth: '650px', margin: 'auto'}}>
+              <h3 style={{textAlign: 'center', color: '#505e71', fontWeight: '600', fontSize: '2.125rem', marginBottom: '55px'}}>Set Custom Break Times</h3>
+              <Box style={{margin: 'auto', maxWidth: '640px'}}>
+                <Box sx={{marginBottom: '15px'}}>
+                  <span style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', marginBottom: '5px'}}>Break Description</span>
+                  <TextField
+                    value={breakTimeName}
+                    onChange={(e) => setBreakTimeName(e.target.value)}
+                    sx={{width: '100%', height: '60px'}}
+                  />
+                </Box>
+                {breakTimeField.map((element, index) => {
+                  return (
+                    <Box sx={{display: 'flex', alignItems: 'flex-end', margin: '5px 0'}}>
+                      <Box sx={{flex: 1}}>
+                        <span style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', marginBottom: '5px'}}>Time Start</span>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                          <TimePicker
+                            sx={{width: '100%', height: '60px'}}
+                          />
+                        </LocalizationProvider>
+                      </Box>
+                      <Box sx={{flex: 1, margin: '0 5px'}}>
+                        <span style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', marginBottom: '5px'}}>Time End</span>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                          <TimePicker
+                            sx={{width: '100%', height: '60px'}}
+                          />
+                        </LocalizationProvider>
+                      </Box>
+                      {index ? 
+                        <Box sx={{flex: 1, margin: '0 5px', minWidth: '60px', maxWidth: '60px'}}>
+                          <SquareButton onClick={() => removeFormFields(index)}>
+                            <RemoveCircleOutlineIcon/>
+                          </SquareButton>
+                        </Box>
+                        :
+                        <Box sx={{flex: 1, margin: '0 5px', minWidth: '60px', maxWidth: '60px'}}>
+                          <SquareButton disabled>
+                            <RemoveCircleOutlineIcon/>
+                          </SquareButton>
+                        </Box>
+                      }
+                    </Box>
+                  )
+                })}
+              <Box sx={{display: 'flex', justifyContent: 'flex-end', margin: '15px 0 0 0'}}>
+                <SquareButton onClick={() => addFormFields()}>
+                  <ControlPointIcon/>
+                </SquareButton>
+              </Box>
+              </Box>
+              <Box style={{maxWidth: '380px', margin: '70px auto 0'}}>
+                <AddButton sx={{width: '360px', height: '75px', marginBottom: '10px'}}>Update</AddButton>
+                <CancelButton sx={{width: '360px', height: '75px'}} onClick={() => handleCloseAddBreaktime()}>Cancel</CancelButton>
+              </Box>
+            </Box>
           </Box>
         </Box>
       </Modal>

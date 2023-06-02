@@ -28,7 +28,7 @@ export const AuthProvider = ({children}) => {
           alert("Status Code: " + error.response.data.status + "\nMessage: " + error.response.data.message);
         })
       } catch(e) {
-        //console.log(e);
+        alert(e);
       }
   }
   const logoutUser = () => {
@@ -52,6 +52,7 @@ export const AuthProvider = ({children}) => {
       .catch((error) => {
         alert("Status Code: " + error.response.data.status + "\nMessage: " + error.response.data.message);
         setToken();
+        localStorage.removeItem('token');
         window.location.reload();
       })
     } catch(e) {

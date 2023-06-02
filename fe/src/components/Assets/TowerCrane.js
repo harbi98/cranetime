@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import '../../Style.css';
-import { Box, Typography, Button, Modal, TextField, IconButton, Autocomplete, Tab, Tabs, InputAdornment } from '@mui/material';
+import { Box, Typography, Button, Modal, TextField, IconButton, Autocomplete, Tab, Tabs } from '@mui/material';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import axios from 'axios';
 import { styled } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
 import ChevronRight from '@mui/icons-material/ChevronRight';
 import EditIcon from '@mui/icons-material/Edit';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import ReplayIcon from '@mui/icons-material/Replay';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
 import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 
@@ -101,8 +103,8 @@ const SquareButton = styled(Button)({
     '"Segoe UI Symbol"',
   ].join(','),
   '&:hover': {
-    backgroundColor: '#004f8a',
-    borderColor: '#004f8a',
+    backgroundColor: '#0f72bd',
+    borderColor: '#0f72bd',
     boxShadow: 'none',
     color: '#ffff'
   },
@@ -193,16 +195,29 @@ const style = {
   width: '100%',
   height: '100%',
   backgroundColor: 'white',
-  overflowY: 'scroll'
+  paddingBottom: '50px'
+  //overflowY: 'scroll'
 };
 
 function TowerCrane() {
   const [tabIndex, setTabIndex] = useState("1");
   const handleChange = (event, newValue) => {
     setTabIndex(newValue);
+    if(newValue === "4") {
+      getDeliveryBays();
+    }
+    if(newValue === "5") {
+      getPlatforms();
+    }
+    if(newValue === "6") {
+      getMCranes();
+    }
   };
 
   const [craneAssets, setCraneAssets] = useState([]);
+  const [mCraneAssets, setMCraneAssets] = useState([]);
+  const [deliveryBayAssets, setDeliveryBayAssets] = useState([]);
+  const [loadingPlatformAssets, setLoadingPlatformAssets] = useState([]);
 
   const [assetID, setAssetID] = useState();
   const [assetName, setAssetName] = useState('');
@@ -219,12 +234,59 @@ function TowerCrane() {
     'Luffer',
     'Hammerhead'
   ];
+  const days = [
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+    'Sunday'
+  ]
   
-  const [breakTimeField, setBreakTimeField] = useState([{time_start: "", time_end: ""}]);
+  const [customAvailability, setCustomAvailability] = useState([]);
+  const [customAvailabilityID, setCustomAvailabilityID] = useState();
+  const [customAvailabilityHours, setCustomAvailabilityHours] = useState([]);
+  const [customAvailabilityName, setCustomAvailabilityName] = useState();
+  const [customDateFrom, setCustomDateFrom] = useState();
+  const [customDateTo, setCustomDateTo] = useState();
+  const [customDays, setCustomDays] = useState([
+    [true, '', ''],
+    [true, '', ''],
+    [true, '', ''],
+    [true, '', ''],
+    [true, '', ''],
+    [true, '', ''],
+    [true, '', ''],
+  ]);
 
-  const handleChangeBreakTime = (i, e) => {
+  const [breakTime, setBreakTime] = useState([]);
+  const [breakTimeName, setBreakTimeName] = useState();
+  const handleChangeCustomDays = (day, e) => {
+    let newFormValues = [...customDays];
+    newFormValues[day][0] = e.target.checked ? true : false;
+    setCustomDays(newFormValues);
+  }
+  const handleChangeCustomDaysTimeStart = (day, e) => {
+    let newFormValues = [...customDays];
+    newFormValues[day][1] = e;
+    setCustomDays(newFormValues);
+  }
+  const handleChangeCustomDaysTimeEnd = (day, e) => {
+    let newFormValues = [...customDays];
+    newFormValues[day][2] = e;
+    setCustomDays(newFormValues);
+  }
+
+  const [breakTimeField, setBreakTimeField] = useState([{time_start: "", time_end: ""}]);
+  const handleChangeBreakTimeStart = (i, e) => {
     let newFormValues = [...breakTimeField];
-    newFormValues[i][e.target.name] = e.target.value;
+    newFormValues[i]['time_start'] = e;
+    setBreakTimeField(newFormValues);
+  }
+  const handleChangeBreakTimeEnd = (i, e) => {
+    let newFormValues = [...breakTimeField];
+    newFormValues[i]['time_end'] = e;
     setBreakTimeField(newFormValues);
   }
     
@@ -254,12 +316,15 @@ function TowerCrane() {
   const handleOpenSetMakeModel = () => setOpenSetMakeModel(true);
   const handleCloseSetMakeModel = () => setOpenSetMakeModel(false);
 
-  const [openAddExemption, setOpenAddExemption] = useState(false);
-  const handleOpenAddExemption = () => setOpenAddExemption(true);
-  const handleCloseAddExemption = () => setOpenAddExemption(false);
+  const [openAddCustomAvailability, setOpenAddCustomAvailability] = useState(false);
+  const handleOpenAddCustomAvailability = () => setOpenAddCustomAvailability(true);
+  const handleCloseAddCustomAvailability = () => setOpenAddCustomAvailability(false);
 
   const [openAddBreaktime, setOpenAddBreaktime] = useState(false);
-  const handleOpenAddBreaktime = () => setOpenAddBreaktime(true);
+  const handleOpenAddBreaktime = (id) => {
+    setOpenAddBreaktime(true);
+    setCustomAvailabilityID(id);
+  };
   const handleCloseAddBreaktime = () => setOpenAddBreaktime(false);
 
   const showAssets = () => {
@@ -273,6 +338,54 @@ function TowerCrane() {
       })
       .then((res) => {
         setCraneAssets(res.data.data);
+      })
+    } catch(e) {
+      console.log(e);
+    }
+  }
+  const getMCranes = () => {
+    const headers = {
+      'Accept': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+    };
+    try {
+      axios.get('http://127.0.0.1:8000/api/assets/mcrane', {
+        headers: headers
+      })
+      .then((res) => {
+        setMCraneAssets(res.data.data);
+      })
+    } catch(e) {
+      console.log(e);
+    }
+  }
+  const getDeliveryBays = () => {
+    const headers = {
+      'Accept': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+    };
+    try {
+      axios.get('http://127.0.0.1:8000/api/assets/bays', {
+        headers: headers
+      })
+      .then((res) => {
+        setDeliveryBayAssets(res.data.data);
+      })
+    } catch(e) {
+      console.log(e);
+    }
+  }
+  const getPlatforms = () => {
+    const headers = {
+      'Accept': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+    };
+    try {
+      axios.get('http://127.0.0.1:8000/api/assets/loading_platform', {
+        headers: headers
+      })
+      .then((res) => {
+        setLoadingPlatformAssets(res.data.data);
       })
     } catch(e) {
       console.log(e);
@@ -305,6 +418,9 @@ function TowerCrane() {
         setAssetSupplier(res.data.data.supplier);
         
         setTabIndex("1");
+        showCustomAvailability(res.data.data.id);
+        showCustomAvailabilityHours(res.data.data.id);
+        showBreaktime(res.data.data.id);
       })
     } catch(e) {
       console.log(e);
@@ -388,6 +504,164 @@ function TowerCrane() {
       console.log(e);
     }
   };
+  const addCustomAvailability = () => {
+    var date_from = new Date(customDateFrom)
+    var finalDateFrom = date_from.getFullYear() + '-' + (date_from.getMonth() + 1) + '-' + date_from.getDate();
+    var date_to = new Date(customDateTo);
+    var finalDateTo = date_to.getFullYear() + '-' + (date_to.getMonth() + 1) + '-' + date_to.getDate();
+    const data = {
+      name: customAvailabilityName,
+      date_start: finalDateFrom,
+      date_to: finalDateTo,
+      asset_id: assetID,
+    };
+    const headers = {
+      'Accept': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+    };
+    try {
+      axios.post('http://127.0.0.1:8000/api/hours-custom-date', data, {
+        headers: headers
+      })
+      .then((res) => {
+        addHours(res.data.id);
+      })
+      .catch((e) => console.log(e))
+    } catch(e) {
+      console.log(e);
+    }
+  };
+  const addHours = (id) => {
+    customDays.map((cus_day, index) => {
+      var date_from = new Date(customDateFrom)
+      var finalDateFrom = date_from.getFullYear() + '-' + (date_from.getMonth() + 1) + '-' + date_from.getDate();
+      var date_to = new Date(customDateTo);
+      var finalDateTo = date_to.getFullYear() + '-' + (date_to.getMonth() + 1) + '-' + date_to.getDate();
+      var time_start = new Date(cus_day[1]);
+      var finalTimeStart = time_start.toLocaleTimeString('it-IT');
+      var time_end = new Date(cus_day[2]);
+      var finalTimeEnd = time_end.toLocaleTimeString('it-IT');
+      console.log(finalTimeStart);
+      const data = {
+        type: 1,
+        asset_id: assetID,
+        date_start: finalDateFrom,
+        date_end: finalDateTo,
+        day: index,
+        time_start: cus_day[0] ? finalTimeStart : '00:00:00',
+        time_end:  cus_day[0] ? finalTimeEnd : '00:00:00',
+        all_day: 1,
+        open: cus_day[0] ? 1 : 0,
+        name: customAvailabilityName,
+        custom_id: id
+      };
+      const headers = {
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      };
+      try {
+        axios.post('http://127.0.0.1:8000/api/hours', data, {
+          headers: headers
+        })
+        .then((res) => {
+          //alert(res.data.message);
+          handleCloseAddCustomAvailability();
+        })
+        .catch((e) => console.log(e))
+      } catch(e) {
+        console.log(e);
+      }
+      return cus_day;
+    })
+    showCustomAvailability(assetID);
+    showCustomAvailabilityHours(assetID);
+  }
+  const addBreaktime = () => {
+    breakTimeField.map((break_time) => {
+      var time_start = new Date(break_time.time_start);
+      var finalTimeStart = time_start.toLocaleTimeString('it-IT');
+      var time_end = new Date(break_time.time_end);
+      var finalTimeEnd = time_end.toLocaleTimeString('it-IT');
+      const data = {
+        type: 2,
+        asset_id: assetID,
+        date_start: '2000-01-01',
+        date_end: '2000-01-01',
+        time_start: finalTimeStart,
+        time_end: finalTimeEnd,
+        all_day: 1,
+        open: 0,
+        name: breakTimeName,
+        custom_id: customAvailabilityID
+      };
+      const headers = {
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      };
+      try {
+        axios.post('http://127.0.0.1:8000/api/breaktime', data, {
+          headers: headers
+        })
+        .then((res) => {
+          alert(res.data.message);
+          showBreaktime(assetID);
+          handleCloseAddBreaktime();
+        })
+        .catch((e) => console.log(e))
+      } catch(e) {
+        console.log(e);
+      }
+      return break_time;
+    })
+  }
+  const showBreaktime = (id) => {
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+    };
+    try {
+      axios.get('http://127.0.0.1:8000/api/breaktime/'+id, {
+        headers: headers
+      })
+      .then((res) => {
+        setBreakTime(res.data.data);
+      })
+    } catch(e) {
+      console.log(e);
+    }
+  }
+  const showCustomAvailability = (id) => {
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+    };
+    try {
+      axios.get('http://127.0.0.1:8000/api/custom-availability/'+id, {
+        headers: headers
+      })
+      .then((res) => {
+        setCustomAvailability(res.data.data);
+      })
+    } catch(e) {
+      console.log(e);
+    }
+  }
+  const showCustomAvailabilityHours = (id) => {
+    const headers = {
+      'Accept': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+    };
+    try {
+      axios.get('http://127.0.0.1:8000/api/hours/'+id, {
+        headers: headers
+      })
+      .then((res) => {
+        setCustomAvailabilityHours(res.data.data);
+      })
+    } catch(e) {
+      console.log(e);
+    }
+  }
   const editAssetName = () => {
     const data = {
       custom_name: customName,
@@ -454,6 +728,11 @@ function TowerCrane() {
     } catch(e) {
       console.log(e);
     }
+  }
+  const convertTime = (time) => {
+    const [hourString, minute] = time.split(":");
+    const hour = +hourString % 24;
+    return (hour % 12 || 12) + ":" + minute + (hour < 12 ? " AM" : " PM");
   }
   useEffect(() => {
     showAssets();
@@ -555,11 +834,24 @@ function TowerCrane() {
           >
             <p style={{fontSize: '1.5rem', fontWeight: '300', color: '#505e71'}}>Capacity Matrix</p>
           </Box>
+          <Box sx={{display: 'flex', flexDirection: 'column', height: 'calc(100% - 75px)'}}>
+            <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between', borderBottom: '1px solid #edf2f6', borderColor: '#edf2f6', padding: '30px' }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', justifyContent: 'center'}}>
+                <p style={{fontSize: '0.875rem', color: '#889ab1', fontWeight: '300', marginBottom: '5px'}}>Capacities</p>
+                <p style={{fontSize: '1.125rem', fontWeight: '200', color: '#505e71', textOverflow: 'ellipsis', overflow: 'hidden'}}>Ma 62kg @ 21m</p>
+              </Box>
+              <Box sx={{ display: 'flex', width: '100px', borderLeft: 2, borderColor: '#edf2f6', alignItems: 'center', justifyContent: 'center'}}>
+                <IconButton>
+                  <EditIcon sx={{color: '#808080'}}/>
+                </IconButton>
+              </Box>
+            </Box>
+          </Box>
         </Box>
       )
     } else if(tabIndex === "4") {
       return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', height: '100%', minWidth: '500px'}}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', height: '100%', minWidth: '500px', overflow: 'scroll'}}>
           <Box sx={{
               display: 'flex',
               alignItems: 'center',
@@ -571,6 +863,59 @@ function TowerCrane() {
             }}
           >
             <p style={{fontSize: '1.5rem', fontWeight: '300', color: '#505e71'}}>Delivery Bays</p>
+          </Box>
+          <Box sx={{display: 'flex', flexDirection: 'column', height: 'calc(100% - 75px)'}}>
+          {deliveryBayAssets.map((mcrane) => (
+            <Box sx={{display: 'block', borderBottom: '1px solid #edf2f6'}}>
+              <div style={{minHeight: '95px', justifyContent: 'space-between', display: 'flex', alignItems: 'center'}}>
+                <div style={{paddingRight: '20px'}}>
+                  <div style={{display: 'flex', alignItems: 'center'}}>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      boxSizing: 'border-box',
+                      height: '35px',
+                      minWidth: '80px',
+                      width: '80px',
+                      textAlign: 'center',
+                      justifyContent: 'center',
+                      marginRight: '20px',
+                      borderRight: '1px solid #edf2f6'
+                    }}>
+                      {/* <img style={{overflowClipMargin: 'content-box', overflow: 'clip'}} src={require("../../icons/truck.png")} alt="Delivery Bays"/> */}
+                      <img style={{width: '32px', height: '32px', filter: "invert(73%) sepia(6%) saturate(1288%) hue-rotate(175deg) brightness(98%) contrast(82%)"}} src={require("../../icons/mcrane.png")} alt="Delivery Bays"/>
+                    </div>
+                    <div style={{display: 'block', boxSizing: 'border-box'}}>
+                      <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', marginBottom: '5px'}}>{mcrane.custom_name}</p>
+                      <p style={{marginBottom: 0, display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem'}}>Est. Distance: [no data yet]</p>
+                    </div>
+                  </div>
+                </div>
+                <div style={{display: 'flex', paddingRight: '30px', alignItems: 'center'}}>
+                  <span style={{padding: '0 20px 0 0', fontWeight: '300', fontSize: '1.125rem', color: '#505e71'}}>
+                    Reachable
+                  </span>
+                  <input
+                    style={{width: '32px', height: '32px', margin: 'auto'}}
+                    type="checkbox"
+                  />
+                </div> 
+              </div>
+              <div style={{padding: '0 30px 30px'}}>
+                <div style={{
+                  minHeight: 400,
+                  backgroundImage: `url(${require("../../images/map.jpg")})`,
+                  backgroundPosition: 'right top',
+                  backgroundRepeat: 'no-repeat',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  borderRadius: '3px'
+                }}>
+
+                </div>
+              </div>
+            </Box>
+          ))}
           </Box>
         </Box>
       )
@@ -589,11 +934,64 @@ function TowerCrane() {
           >
             <p style={{fontSize: '1.5rem', fontWeight: '300', color: '#505e71'}}>Loading Platforms</p>
           </Box>
+          <Box sx={{display: 'flex', flexDirection: 'column', height: 'calc(100% - 75px)'}}>
+          {loadingPlatformAssets.map((platform) => (
+            <Box sx={{display: 'block', borderBottom: '1px solid #edf2f6'}}>
+              <div style={{minHeight: '95px', justifyContent: 'space-between', display: 'flex', alignItems: 'center'}}>
+                <div style={{paddingRight: '20px'}}>
+                  <div style={{display: 'flex', alignItems: 'center'}}>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      boxSizing: 'border-box',
+                      height: '35px',
+                      minWidth: '80px',
+                      width: '80px',
+                      textAlign: 'center',
+                      justifyContent: 'center',
+                      marginRight: '20px',
+                      borderRight: '1px solid #edf2f6'
+                    }}>
+                      {/* <img style={{overflowClipMargin: 'content-box', overflow: 'clip'}} src={require("../../icons/truck.png")} alt="Delivery Bays"/> */}
+                      <img style={{width: '32px', height: '32px', filter: "invert(73%) sepia(6%) saturate(1288%) hue-rotate(175deg) brightness(98%) contrast(82%)"}} src={require("../../icons/mcrane.png")} alt="Delivery Bays"/>
+                    </div>
+                    <div style={{display: 'block', boxSizing: 'border-box'}}>
+                      <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', marginBottom: '5px'}}>{platform.custom_name}</p>
+                      <p style={{marginBottom: 0, display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem'}}>Est. Distance: [no data yet]</p>
+                    </div>
+                  </div>
+                </div>
+                <div style={{display: 'flex', paddingRight: '30px', alignItems: 'center'}}>
+                  <span style={{padding: '0 20px 0 0', fontWeight: '300', fontSize: '1.125rem', color: '#505e71'}}>
+                    Reachable
+                  </span>
+                  <input
+                    style={{width: '32px', height: '32px', margin: 'auto'}}
+                    type="checkbox"
+                  />
+                </div> 
+              </div>
+              <div style={{padding: '0 30px 30px'}}>
+                <div style={{
+                  minHeight: 400,
+                  backgroundImage: `url(${require("../../images/map.jpg")})`,
+                  backgroundPosition: 'right top',
+                  backgroundRepeat: 'no-repeat',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  borderRadius: '3px'
+                }}>
+
+                </div>
+              </div>
+            </Box>
+          ))}
+          </Box>
         </Box>
       )
     } else if(tabIndex === "6") {
       return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', height: '100%', minWidth: '500px'}}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', height: '100%', minWidth: '500px', overflowY: 'scroll'}}>
           <Box sx={{
               display: 'flex',
               alignItems: 'center',
@@ -605,6 +1003,59 @@ function TowerCrane() {
             }}
           >
             <p style={{fontSize: '1.5rem', fontWeight: '300', color: '#505e71'}}>Mobile Cranes</p>
+          </Box>
+          <Box sx={{display: 'flex', flexDirection: 'column', height: 'calc(100% - 75px)'}}>
+          {mCraneAssets.map((mcrane) => (
+            <Box sx={{display: 'block', borderBottom: '1px solid #edf2f6'}}>
+              <div style={{minHeight: '95px', justifyContent: 'space-between', display: 'flex', alignItems: 'center'}}>
+                <div style={{paddingRight: '20px'}}>
+                  <div style={{display: 'flex', alignItems: 'center'}}>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      boxSizing: 'border-box',
+                      height: '35px',
+                      minWidth: '80px',
+                      width: '80px',
+                      textAlign: 'center',
+                      justifyContent: 'center',
+                      marginRight: '20px',
+                      borderRight: '1px solid #edf2f6'
+                    }}>
+                      {/* <img style={{overflowClipMargin: 'content-box', overflow: 'clip'}} src={require("../../icons/truck.png")} alt="Delivery Bays"/> */}
+                      <img style={{width: '32px', height: '32px', filter: "invert(73%) sepia(6%) saturate(1288%) hue-rotate(175deg) brightness(98%) contrast(82%)"}} src={require("../../icons/mcrane.png")} alt="Delivery Bays"/>
+                    </div>
+                    <div style={{display: 'block', boxSizing: 'border-box'}}>
+                      <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', marginBottom: '5px'}}>{mcrane.custom_name}</p>
+                      <p style={{marginBottom: 0, display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem'}}>Est. Distance: [no data yet]</p>
+                    </div>
+                  </div>
+                </div>
+                <div style={{display: 'flex', paddingRight: '30px', alignItems: 'center'}}>
+                  <span style={{padding: '0 20px 0 0', fontWeight: '300', fontSize: '1.125rem', color: '#505e71'}}>
+                    Reachable
+                  </span>
+                  <input
+                    style={{width: '32px', height: '32px', margin: 'auto'}}
+                    type="checkbox"
+                  />
+                </div> 
+              </div>
+              <div style={{padding: '0 30px 30px'}}>
+                <div style={{
+                  minHeight: 400,
+                  backgroundImage: `url(${require("../../images/map.jpg")})`,
+                  backgroundPosition: 'right top',
+                  backgroundRepeat: 'no-repeat',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  borderRadius: '3px'
+                }}>
+
+                </div>
+              </div>
+            </Box>
+          ))}
           </Box>
         </Box>
       )
@@ -686,15 +1137,89 @@ function TowerCrane() {
                 <p style={{color: '#889ab1', fontWeight: '300', fontSize: '0.875rem'}}>Asset availability runs off the site opening times and exemptions unless you set custom availability.</p>
               </Box>
               <Box sx={{width: '50%', padding: '0 25px'}}>
-                <AddButton sx={{width: '100%'}} onClick={() => handleOpenAddExemption()}>Add Custom Availability</AddButton>
+                <AddButton sx={{width: '100%'}} onClick={() => handleOpenAddCustomAvailability()}>Add Custom Availability</AddButton>
               </Box>
             </Box>
-            <Box sx={{borderBottom: '1px solid #edf2f6', padding: '35px'}}>
-              <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem'}}>Breaks</p>
-            </Box>
-            <Box sx={{borderBottom: '1px solid #edf2f6', padding: '20px'}}>
-              <AddButton sx={{width: '100%'}} onClick={() => handleOpenAddBreaktime()}>Add Break Time</AddButton>
-            </Box>
+            {customAvailability ? 
+              customAvailability.map((custom_availability, index) => {
+                return (
+                  <>
+                    <Box sx={{borderBottom: '1px solid #edf2f6', padding: '35px'}}>
+                      <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.5rem', marginBottom: '5px'}}>{custom_availability.name + ' Opening Times'}</p>
+                      <p style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem'}}>{custom_availability.date_start} - {custom_availability.date_to}</p>
+                    </Box>
+                    <Box sx={{borderBottom: '1px solid #edf2f6', padding: '35px'}}>
+                      <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem'}}>Daily Opening Times</p>
+                    </Box>
+                    <Box sx={{display: 'flex', justifyContent: 'space-between', padding: '15px 0', borderBottom: '1px solid #edf2f6'}}>
+                      <p style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', padding: '0 35px', minWidth: '150px', width: '100%'}}>Day</p>
+                      <p style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', padding: '0 35px', minWidth: '150px'}}>Start</p>
+                      <p style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', padding: '0 35px', minWidth: '150px'}}>End</p>
+                    </Box>
+                    {customAvailabilityHours ?
+                      customAvailabilityHours.map((custom_availability_hours) => {
+                        if(custom_availability_hours.custom_id === custom_availability.id) {
+                          return (
+                            <Box sx={{display: 'flex', justifyContent: 'space-between', padding: '25px 0', borderBottom: '1px dotted #edf2f6'}}>
+                              {custom_availability_hours.open === 1 ?
+                                <>
+                                  <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', padding: '0 35px', minWidth: '150px', width: '100%'}}>{days[custom_availability_hours.day]}</p>
+                                  <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', padding: '0 35px', minWidth: '150px'}}>{convertTime(custom_availability_hours.time_start)}</p>
+                                  <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', padding: '0 35px', minWidth: '150px'}}>{convertTime(custom_availability_hours.time_end)}</p>
+                                </>
+                              : 
+                                <>
+                                  <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', padding: '0 35px', minWidth: '150px', width: '100%'}}>{days[custom_availability_hours.day]}</p>
+                                  <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', padding: '0 35px', minWidth: '150px'}}>Closed</p>
+                                </>
+                              }
+                            </Box>
+                          )
+                        }
+                        return null;
+                      })
+                    : 
+                      null
+                    }
+                    <Box sx={{textAlign: 'center', padding: '20px', borderBottom: '1px solid #edf2f6'}}>
+                      <IconButton onClick={() => alert('pressed')}>
+                        <EditIcon/>
+                      </IconButton>
+                    </Box>
+                    <Box sx={{borderBottom: '1px solid #edf2f6', padding: '35px'}}>
+                      <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem'}}>Breaks</p>
+                    </Box>
+                    <Box sx={{borderBottom: '1px solid #edf2f6', padding: '20px'}}>
+                      <AddButton sx={{width: '100%'}} onClick={() => handleOpenAddBreaktime(custom_availability.id)}>Add Break Time</AddButton>
+                    </Box>
+                    {breakTime ?
+                        breakTime.map((breaks) => {
+                          if(breaks.custom_id === custom_availability.id) {
+                            return (
+                              <Box sx={{display: 'flex', justifyContent: 'space-between', padding: '30px', borderBottom: '1px solid #edf2f6'}}>
+                                <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', paddingRight: '30px', borderRight: '1px solid #edf2f6'}}>
+                                  <Box sx={{width: '100%'}}>
+                                    <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', marginBottom: '5px', textOverflow: 'ellipsis', overflow: 'hidden'}}>{breaks.name}</p>
+                                    <p style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem'}}>12:00 PM:00 - 01:00 PM / Every day</p>
+                                  </Box>
+                                </Box>
+                                <IconButton sx={{alignSelf: 'center', alignItems: 'center', justifyContent: 'center', marginLeft: '30px'}} onClick={() => alert('pressed')}>
+                                  <EditIcon/>
+                                </IconButton>
+                              </Box>
+                            )
+                          }
+                          return null
+                        })
+                      :
+                        null
+                    }
+                  </>
+                )
+              })
+            : 
+              null
+            }
             <Box sx={{borderBottom: '1px solid #edf2f6', padding: '35px'}}>
               <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.5rem', marginBottom: '5px'}}>Exemptions</p>
               <p style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem'}}>Create periods either open or closed overriding all opening times.</p>
@@ -762,223 +1287,227 @@ function TowerCrane() {
           </Box>
         </Box>
       </Box>
-      <Box sx={{display: 'flex', width: '100%'}}>
-        <Box sx={{
-          overflow: 'auto',
-          width: 415,
-          maxWidth: 415,
-          height: '100%',
-          boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)',
-        }}
-        >
-          <Box sx={{
-            padding: '30px',
-            borderBottom: 1,
-            borderBottomColor: '#edf2f6',
-          }}>
+      {craneAssets.length ? 
+          <Box sx={{display: 'flex', width: '100%'}}>
             <Box sx={{
-              minHeight: '215px',
-              borderRadius: '3px',
-              border: 1,
-              borderColor: '#edf2f6',
-              backgroundColor: '#f9fbfd',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: '25px'
-            }}>
-              <img style={{width: '32px', height: '32px', filter: "invert(36%) sepia(18%) saturate(535%) hue-rotate(175deg) brightness(94%) contrast(93%)"}} src={require("../../icons/crane.png")} alt="Crane"/>
-            </Box>
-            <Box sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              textAlign: 'center',
-            }}>
-              <Typography sx={{color: '#505e71', fontWeight: 300, fontSize: '1.5rem'}}>{assetName ? assetName : 'N/A'}</Typography>
-            </Box>
-          </Box>
-          <Box sx={{
-            display: 'flex',
-            padding: '15px 20px',
-            borderBottom: 1,
-            borderBottomColor: '#edf2f6'
-          }}>
-            <Typography sx={{display: 'inline-block', fontWeight: 300, fontSize: '0.875rem', color: '#889ab1'}}>Crane Settings</Typography>
-          </Box>
-          <Box display="block">
-            <AntTabs
-              orientation='vertical'
-              value={tabIndex}
-              onChange={handleChange}
-              TabIndicatorProps={{
-                sx: {
-                  left: 5,
-                  width: 5,
-                  borderRadius: 2,
-                },
-                style: {
-                  backgroundColor: '#0f72bd',
-                }
-              }}
-              sx={{height: '100%'}}
-              scrollButtons={false}
+              overflow: 'auto',
+              width: 415,
+              maxWidth: 415,
+              height: '100%',
+              boxShadow: '3px 3px 7px rgba(103, 162, 206, 0.2)',
+            }}
             >
-              <AntTab value="1" label={
-                  <React.Fragment>
-                    <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
-                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
-                        <img style={{width: '32px', height: '32px'}} src={require("../../icons/crane.png")} alt="Crane"/>
-                        <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
-                        <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Crane Info</Typography>
-                      </Box>
-                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
-                        <ChevronRight/>
-                      </Box>
-                    </Box>
-                  </React.Fragment>
-                }
-              />
-              <AntTab value="2" label={
-                  <React.Fragment>
-                    <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
-                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
-                        <img style={{width: '32px', height: '32px'}} src={require("../../icons/pin.png")} alt="Location"/>
-                        <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
-                        <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Location</Typography>
-                      </Box>
-                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
-                        <ChevronRight/>
-                      </Box>
-                    </Box>
-                  </React.Fragment>
-                }
-              />
-              <AntTab value="3" label={
-                  <React.Fragment>
-                    <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
-                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
-                        <img style={{width: '32px', height: '32px'}} src={require("../../icons/grid.png")} alt="Grid"/>
-                        <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
-                        <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Capacity Matrix</Typography>
-                      </Box>
-                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
-                        <ChevronRight/>
-                      </Box>
-                    </Box>
-                  </React.Fragment>
-                }
-              />
-              <AntTab value="4" label={
-                  <React.Fragment>
-                    <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
-                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
-                        <img style={{width: '32px', height: '32px'}} src={require("../../icons/truck.png")} alt="Delivery Bays"/>
-                        <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
-                        <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Delivery Bays</Typography>
-                      </Box>
-                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
-                        <ChevronRight/>
-                      </Box>
-                    </Box>
-                  </React.Fragment>
-                }
-              />
-              <AntTab value="5" label={
-                  <React.Fragment>
-                    <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
-                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
-                        <img style={{width: '32px', height: '32px'}} src={require("../../icons/platform.png")} alt="Loading Platforms"/>
-                        <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
-                        <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Loading Platforms</Typography>
-                      </Box>
-                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
-                        <ChevronRight/>
-                      </Box>
-                    </Box>
-                  </React.Fragment>
-                }
-              />
-              <AntTab value="6" label={
-                  <React.Fragment>
-                    <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
-                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
-                        <img style={{width: '32px', height: '32px'}} src={require("../../icons/mcrane.png")} alt="Mobile Cranes"/>
-                        <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
-                        <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Mobile Cranes</Typography>
-                      </Box>
-                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
-                        <ChevronRight/>
-                      </Box>
-                    </Box>
-                  </React.Fragment>
-                }
-              />
-              <AntTab value="7" label={
-                  <React.Fragment>
-                    <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
-                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
-                        <img style={{width: '32px', height: '32px'}} src={require("../../icons/elevator.png")} alt="Hoist"/>
-                        <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
-                        <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Hoist</Typography>
-                      </Box>
-                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
-                        <ChevronRight/>
-                      </Box>
-                    </Box>
-                  </React.Fragment>
-                }
-              />
-              <AntTab value="8" label={
-                  <React.Fragment>
-                    <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
-                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
-                        <img style={{width: '32px', height: '32px'}} src={require("../../icons/lifter.png")} alt="Material Handling"/>
-                        <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
-                        <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Material Handling</Typography>
-                      </Box>
-                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
-                        <ChevronRight/>
-                      </Box>
-                    </Box>
-                  </React.Fragment>
-                }
-              />
-              <AntTab value="9" label={
-                  <React.Fragment>
-                    <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
-                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
-                        <img style={{width: '32px', height: '32px'}} src={require("../../icons/concrete-truck.png")} alt="Concrete Pumps"/>
-                        <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
-                        <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Concrete Pumps</Typography>
-                      </Box>
-                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
-                        <ChevronRight/>
-                      </Box>
-                    </Box>
-                  </React.Fragment>
-                }
-              />
-              <AntTab value="10" label={
-                  <React.Fragment>
-                    <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
-                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
-                        <img style={{width: '32px', height: '32px'}} src={require("../../icons/calendar.png")} alt="Availability"/>
-                        <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
-                        <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Availability</Typography>
-                      </Box>
-                      <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
-                        <ChevronRight/>
-                      </Box>
-                    </Box>
-                  </React.Fragment>
-                }
-              />
-            </AntTabs>
+              <Box sx={{
+                padding: '30px',
+                borderBottom: 1,
+                borderBottomColor: '#edf2f6',
+              }}>
+                <Box sx={{
+                  minHeight: '215px',
+                  borderRadius: '3px',
+                  border: 1,
+                  borderColor: '#edf2f6',
+                  backgroundColor: '#f9fbfd',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '25px'
+                }}>
+                  <img style={{width: '32px', height: '32px', filter: "invert(36%) sepia(18%) saturate(535%) hue-rotate(175deg) brightness(94%) contrast(93%)"}} src={require("../../icons/crane.png")} alt="Crane"/>
+                </Box>
+                <Box sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  textAlign: 'center',
+                }}>
+                  <Typography sx={{color: '#505e71', fontWeight: 300, fontSize: '1.5rem'}}>{assetName ? assetName : 'N/A'}</Typography>
+                </Box>
+              </Box>
+              <Box sx={{
+                display: 'flex',
+                padding: '15px 20px',
+                borderBottom: 1,
+                borderBottomColor: '#edf2f6'
+              }}>
+                <Typography sx={{display: 'inline-block', fontWeight: 300, fontSize: '0.875rem', color: '#889ab1'}}>Crane Settings</Typography>
+              </Box>
+              <Box display="block">
+                <AntTabs
+                  orientation='vertical'
+                  value={tabIndex}
+                  onChange={handleChange}
+                  TabIndicatorProps={{
+                    sx: {
+                      left: 5,
+                      width: 5,
+                      borderRadius: 2,
+                    },
+                    style: {
+                      backgroundColor: '#0f72bd',
+                    }
+                  }}
+                  sx={{height: '100%'}}
+                  scrollButtons={false}
+                >
+                  <AntTab value="1" label={
+                      <React.Fragment>
+                        <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                          <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                            <img style={{width: '32px', height: '32px'}} src={require("../../icons/crane.png")} alt="Crane"/>
+                            <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
+                            <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Crane Info</Typography>
+                          </Box>
+                          <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                            <ChevronRight/>
+                          </Box>
+                        </Box>
+                      </React.Fragment>
+                    }
+                  />
+                  <AntTab value="2" label={
+                      <React.Fragment>
+                        <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                          <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                            <img style={{width: '32px', height: '32px'}} src={require("../../icons/pin.png")} alt="Location"/>
+                            <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
+                            <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Location</Typography>
+                          </Box>
+                          <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                            <ChevronRight/>
+                          </Box>
+                        </Box>
+                      </React.Fragment>
+                    }
+                  />
+                  <AntTab value="3" label={
+                      <React.Fragment>
+                        <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                          <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                            <img style={{width: '32px', height: '32px'}} src={require("../../icons/grid.png")} alt="Grid"/>
+                            <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
+                            <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Capacity Matrix</Typography>
+                          </Box>
+                          <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                            <ChevronRight/>
+                          </Box>
+                        </Box>
+                      </React.Fragment>
+                    }
+                  />
+                  <AntTab value="4" label={
+                      <React.Fragment>
+                        <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                          <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                            <img style={{width: '32px', height: '32px'}} src={require("../../icons/truck.png")} alt="Delivery Bays"/>
+                            <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
+                            <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Delivery Bays</Typography>
+                          </Box>
+                          <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                            <ChevronRight/>
+                          </Box>
+                        </Box>
+                      </React.Fragment>
+                    }
+                  />
+                  <AntTab value="5" label={
+                      <React.Fragment>
+                        <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                          <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                            <img style={{width: '32px', height: '32px'}} src={require("../../icons/platform.png")} alt="Loading Platforms"/>
+                            <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
+                            <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Loading Platforms</Typography>
+                          </Box>
+                          <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                            <ChevronRight/>
+                          </Box>
+                        </Box>
+                      </React.Fragment>
+                    }
+                  />
+                  <AntTab value="6" label={
+                      <React.Fragment>
+                        <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                          <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                            <img style={{width: '32px', height: '32px'}} src={require("../../icons/mcrane.png")} alt="Mobile Cranes"/>
+                            <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
+                            <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Mobile Cranes</Typography>
+                          </Box>
+                          <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                            <ChevronRight/>
+                          </Box>
+                        </Box>
+                      </React.Fragment>
+                    }
+                  />
+                  <AntTab value="7" label={
+                      <React.Fragment>
+                        <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                          <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                            <img style={{width: '32px', height: '32px'}} src={require("../../icons/elevator.png")} alt="Hoist"/>
+                            <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
+                            <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Hoist</Typography>
+                          </Box>
+                          <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                            <ChevronRight/>
+                          </Box>
+                        </Box>
+                      </React.Fragment>
+                    }
+                  />
+                  <AntTab value="8" label={
+                      <React.Fragment>
+                        <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                          <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                            <img style={{width: '32px', height: '32px'}} src={require("../../icons/lifter.png")} alt="Material Handling"/>
+                            <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
+                            <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Material Handling</Typography>
+                          </Box>
+                          <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                            <ChevronRight/>
+                          </Box>
+                        </Box>
+                      </React.Fragment>
+                    }
+                  />
+                  <AntTab value="9" label={
+                      <React.Fragment>
+                        <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                          <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                            <img style={{width: '32px', height: '32px'}} src={require("../../icons/concrete-truck.png")} alt="Concrete Pumps"/>
+                            <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
+                            <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Concrete Pumps</Typography>
+                          </Box>
+                          <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                            <ChevronRight/>
+                          </Box>
+                        </Box>
+                      </React.Fragment>
+                    }
+                  />
+                  <AntTab value="10" label={
+                      <React.Fragment>
+                        <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                          <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                            <img style={{width: '32px', height: '32px'}} src={require("../../icons/calendar.png")} alt="Availability"/>
+                            <Box sx={{height: '50px', borderLeft: 1, borderColor: '#edf2f6', margin: '0px 25px'}}/>
+                            <Typography sx={{fontWeight: 400, fontSize: '1.125rem'}}>Availability</Typography>
+                          </Box>
+                          <Box sx={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', padding: '0px 20px'}}>
+                            <ChevronRight/>
+                          </Box>
+                        </Box>
+                      </React.Fragment>
+                    }
+                  />
+                </AntTabs>
+              </Box>
+            </Box>
+            {tabView()}
           </Box>
-        </Box>
-        {tabView()}
-      </Box>
+        :
+          null
+      }
       {/* ------------------------------------- //////////////// Modals ///////////////// ------------------------------------- */}
       <Modal
         open={open}
@@ -1121,46 +1650,42 @@ function TowerCrane() {
         </Box>
       </Modal>
       <Modal
-        open={openAddExemption}
+        open={openAddCustomAvailability}
       >
         <Box sx={style}>
           <Box sx={{display: 'flex', borderBottom: '1px solid #edf2f6', width: '100%', height: '75px', justifyContent: 'flex-end', padding: '10px'}}>
-            <IconButton sx={{alignSelf: 'center'}} onClick={() => handleCloseAddExemption()}>
+            <IconButton sx={{alignSelf: 'center'}} onClick={() => handleCloseAddCustomAvailability()}>
               <CloseIcon/>
             </IconButton>
           </Box>
-          <Box sx={{padding: '70px 25px'}}>
+          <Box sx={{
+            padding: '70px 25px',
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'white',
+            overflowY: 'scroll'
+          }}>
             <Box sx={{maxWidth: '650px', margin: 'auto'}}>
               <h3 style={{textAlign: 'center', color: '#505e71', fontWeight: '600', fontSize: '2.125rem', marginBottom: '55px'}}>Set Custom Opening Times</h3>
               <Box style={{margin: 'auto', maxWidth: '640px'}}>
                 <Box sx={{marginBottom: '15px'}}>
                   <span style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875', marginBottom: '5px'}}>Period Description</span>
-                  <TextField sx={{width: '100%', height: '60px'}}/>
+                  <TextField sx={{width: '100%', height: '60px'}} onChange={(e) => setCustomAvailabilityName(e.target.value)}/>
                 </Box>
                 <Box sx={{marginBottom: '15px'}}>
                   <Box sx={{marginBottom: '15px'}}>
                     <Box sx={{display: 'flex', margin: '0 -10px'}}>
                       <Box sx={{flex: 1, margin: '0 10px'}}>
                         <span style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875', marginBottom: '5px'}}>From</span>
-                        <TextField
-                          sx={{width: '100%', height: '60px'}}
-                          InputProps={{startAdornment: (
-                            <InputAdornment position='start'>
-                              <CalendarTodayIcon/>
-                            </InputAdornment>
-                          )}}
-                        />
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                          <DatePicker sx={{width: '100%', height: '60px'}} onChange={(e) => setCustomDateFrom(e)}/>
+                        </LocalizationProvider>
                       </Box>
                       <Box sx={{flex: 1, margin: '0 10px'}}>
                         <span style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875', marginBottom: '5px'}}>To</span>
-                        <TextField
-                          sx={{width: '100%', height: '60px'}}
-                          InputProps={{startAdornment: (
-                            <InputAdornment position='start'>
-                              <CalendarTodayIcon/>
-                            </InputAdornment>
-                          )}}
-                        />
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                          <DatePicker sx={{width: '100%', height: '60px'}} onChange={(e) => setCustomDateTo(e)}/>
+                        </LocalizationProvider>
                       </Box>
                     </Box>
                   </Box>
@@ -1187,45 +1712,426 @@ function TowerCrane() {
                     </Box>
                     <Box sx={{display: 'flex', minHeight: '60px', margin: '0 0 10px'}}>
                       <Box sx={{display: 'flex', alignItems: 'center', width: '210px', minWidth: '210px', margin: '0 5px 0 0'}}>
-                        <input style={{width: '32px', height: '32px'}} type="checkbox"/>
+                        <input
+                          style={{width: '32px', height: '32px'}}
+                          type="checkbox"
+                          checked={customDays[0][0] ? true : false}
+                          onChange={(e) => handleChangeCustomDays(0, e)}
+                        />
                         <span style={{fontSize: '1.125rem', color: '#8796aa', paddingLeft: '18px'}}>Monday</span>
                       </Box>
                       <Box sx={{position: 'relative', display: 'flex', alignItems: 'center', flex: 1, margin: '0 0 0 5px'}}>
-                        <Box sx={{flex: 1, margin: '0 5px', minWidth: '58px', maxWidth: '58px'}}>
-                          <SquareButton>
-                            <ReplayIcon/>
-                          </SquareButton>
-                        </Box>
-                        <Box sx={{position: 'relative', display: 'flex', width: '100%'}}>
-                          <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
-                            <TextField
-                              sx={{width: '100%', height: '60px'}}
-                              InputProps={{startAdornment: (
-                                <InputAdornment position='start'>
-                                  <AccessTimeIcon/>
-                                </InputAdornment>
-                              )}}
-                            />
-                          </Box>
-                          <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
-                            <TextField
-                              sx={{width: '100%', height: '60px'}}
-                              InputProps={{startAdornment: (
-                                <InputAdornment position='start'>
-                                  <AccessTimeIcon/>
-                                </InputAdornment>
-                              )}}
-                            />
-                          </Box>
-                        </Box>
+                        {customDays[0][0] ?
+                          <>
+                            <Box sx={{flex: 1, margin: '0 5px', minWidth: '58px', maxWidth: '58px'}}>
+                              <SquareButton>
+                                <ReplayIcon/>
+                              </SquareButton>
+                            </Box>
+                            <Box sx={{position: 'relative', display: 'flex', width: '100%'}}>
+                              <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                  <TimePicker
+                                    value={customDays[0][1]}
+                                    onChange={(e) => handleChangeCustomDaysTimeStart(0, e)}
+                                  />
+                                </LocalizationProvider>
+                              </Box>
+                              <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                  <TimePicker
+                                    value={customDays[0][2]}
+                                    onChange={(e) => handleChangeCustomDaysTimeEnd(0, e)}
+                                  />
+                                </LocalizationProvider>
+                              </Box>
+                            </Box>
+                          </>
+                        :
+                          <div style={{
+                            position: 'absolute',
+                            top: 0,
+                            bottom: 0,
+                            left: '5px',
+                            right: '5px',
+                            padding: '0 10px',
+                            textAlign: 'center',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderRadius: '3px',
+                            border: '1px solid #edf2f6',
+                            backgroundImage: `url(${require("../../images/update_bg.jpg")})`,
+                            backgroundRepeat: 'repeat',
+                          }}>
+                            <p style={{color: '#8796aa', fontWeight: '300', fontSize: '0.875rem'}}>Day Set To Closed</p>
+                          </div>
+                        }
+                      </Box>
+                    </Box>
+                    <Box sx={{display: 'flex', minHeight: '60px', margin: '0 0 10px'}}>
+                      <Box sx={{display: 'flex', alignItems: 'center', width: '210px', minWidth: '210px', margin: '0 5px 0 0'}}>
+                        <input
+                          style={{width: '32px', height: '32px'}}
+                          type="checkbox"
+                          checked={customDays[1][0] ? true : false}
+                          onChange={(e) => handleChangeCustomDays(1, e)}
+                        />
+                        <span style={{fontSize: '1.125rem', color: '#8796aa', paddingLeft: '18px'}}>Tuesday</span>
+                      </Box>
+                      <Box sx={{position: 'relative', display: 'flex', alignItems: 'center', flex: 1, margin: '0 0 0 5px'}}>
+                        {customDays[1][0] ?
+                          <>
+                            <Box sx={{flex: 1, margin: '0 5px', minWidth: '58px', maxWidth: '58px'}}>
+                              <SquareButton>
+                                <ReplayIcon/>
+                              </SquareButton>
+                            </Box>
+                            <Box sx={{position: 'relative', display: 'flex', width: '100%'}}>
+                              <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                  <TimePicker
+                                    value={customDays[1][1]}
+                                    onChange={(e) => handleChangeCustomDaysTimeStart(1, e)}
+                                  />
+                                </LocalizationProvider>
+                              </Box>
+                              <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                  <TimePicker
+                                    value={customDays[1][2]}
+                                    onChange={(e) => handleChangeCustomDaysTimeEnd(1, e)}
+                                  />
+                                </LocalizationProvider>
+                              </Box>
+                            </Box>
+                          </>
+                        :
+                          <div style={{
+                            position: 'absolute',
+                            top: 0,
+                            bottom: 0,
+                            left: '5px',
+                            right: '5px',
+                            padding: '0 10px',
+                            textAlign: 'center',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderRadius: '3px',
+                            border: '1px solid #edf2f6',
+                            backgroundImage: `url(${require("../../images/update_bg.jpg")})`,
+                            backgroundRepeat: 'repeat',
+                          }}>
+                            <p style={{color: '#8796aa', fontWeight: '300', fontSize: '0.875rem'}}>Day Set To Closed</p>
+                          </div>
+                        }
+                      </Box>
+                    </Box>
+                    <Box sx={{display: 'flex', minHeight: '60px', margin: '0 0 10px'}}>
+                      <Box sx={{display: 'flex', alignItems: 'center', width: '210px', minWidth: '210px', margin: '0 5px 0 0'}}>
+                        <input
+                          style={{width: '32px', height: '32px'}}
+                          type="checkbox"
+                          checked={customDays[2][0] ? true : false}
+                          onChange={(e) => handleChangeCustomDays(2, e)}
+                        />
+                        <span style={{fontSize: '1.125rem', color: '#8796aa', paddingLeft: '18px'}}>Wednesday</span>
+                      </Box>
+                      <Box sx={{position: 'relative', display: 'flex', alignItems: 'center', flex: 1, margin: '0 0 0 5px'}}>
+                        {customDays[2][0] ?
+                          <>
+                            <Box sx={{flex: 1, margin: '0 5px', minWidth: '58px', maxWidth: '58px'}}>
+                              <SquareButton>
+                                <ReplayIcon/>
+                              </SquareButton>
+                            </Box>
+                            <Box sx={{position: 'relative', display: 'flex', width: '100%'}}>
+                              <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                  <TimePicker
+                                    value={customDays[2][1]}
+                                    onChange={(e) => handleChangeCustomDaysTimeStart(2, e)}
+                                  />
+                                </LocalizationProvider>
+                              </Box>
+                              <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                  <TimePicker
+                                    value={customDays[2][2]}
+                                    onChange={(e) => handleChangeCustomDaysTimeEnd(2, e)}
+                                  />
+                                </LocalizationProvider>
+                              </Box>
+                            </Box>
+                          </>
+                        :
+                          <div style={{
+                            position: 'absolute',
+                            top: 0,
+                            bottom: 0,
+                            left: '5px',
+                            right: '5px',
+                            padding: '0 10px',
+                            textAlign: 'center',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderRadius: '3px',
+                            border: '1px solid #edf2f6',
+                            backgroundImage: `url(${require("../../images/update_bg.jpg")})`,
+                            backgroundRepeat: 'repeat',
+                          }}>
+                            <p style={{color: '#8796aa', fontWeight: '300', fontSize: '0.875rem'}}>Day Set To Closed</p>
+                          </div>
+                        }
+                      </Box>
+                    </Box>
+                    <Box sx={{display: 'flex', minHeight: '60px', margin: '0 0 10px'}}>
+                      <Box sx={{display: 'flex', alignItems: 'center', width: '210px', minWidth: '210px', margin: '0 5px 0 0'}}>
+                        <input
+                          style={{width: '32px', height: '32px'}}
+                          type="checkbox"
+                          checked={customDays[3][0] ? true : false}
+                          onChange={(e) => handleChangeCustomDays(3, e)}
+                        />
+                        <span style={{fontSize: '1.125rem', color: '#8796aa', paddingLeft: '18px'}}>Thursday</span>
+                      </Box>
+                      <Box sx={{position: 'relative', display: 'flex', alignItems: 'center', flex: 1, margin: '0 0 0 5px'}}>
+                        {customDays[3][0] ?
+                          <>
+                            <Box sx={{flex: 1, margin: '0 5px', minWidth: '58px', maxWidth: '58px'}}>
+                              <SquareButton>
+                                <ReplayIcon/>
+                              </SquareButton>
+                            </Box>
+                            <Box sx={{position: 'relative', display: 'flex', width: '100%'}}>
+                              <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                  <TimePicker
+                                    value={customDays[3][1]}
+                                    onChange={(e) => handleChangeCustomDaysTimeStart(3, e)}
+                                  />
+                                </LocalizationProvider>
+                              </Box>
+                              <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                  <TimePicker
+                                    value={customDays[3][2]}
+                                    onChange={(e) => handleChangeCustomDaysTimeEnd(3, e)}
+                                  />
+                                </LocalizationProvider>
+                              </Box>
+                            </Box>
+                          </>
+                        :
+                          <div style={{
+                            position: 'absolute',
+                            top: 0,
+                            bottom: 0,
+                            left: '5px',
+                            right: '5px',
+                            padding: '0 10px',
+                            textAlign: 'center',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderRadius: '3px',
+                            border: '1px solid #edf2f6',
+                            backgroundImage: `url(${require("../../images/update_bg.jpg")})`,
+                            backgroundRepeat: 'repeat',
+                          }}>
+                            <p style={{color: '#8796aa', fontWeight: '300', fontSize: '0.875rem'}}>Day Set To Closed</p>
+                          </div>
+                        }
+                      </Box>
+                    </Box>
+                    <Box sx={{display: 'flex', minHeight: '60px', margin: '0 0 10px'}}>
+                      <Box sx={{display: 'flex', alignItems: 'center', width: '210px', minWidth: '210px', margin: '0 5px 0 0'}}>
+                        <input
+                          style={{width: '32px', height: '32px'}}
+                          type="checkbox"
+                          checked={customDays[4][0] ? true : false}
+                          onChange={(e) => handleChangeCustomDays(4, e)}
+                        />
+                        <span style={{fontSize: '1.125rem', color: '#8796aa', paddingLeft: '18px'}}>Friday</span>
+                      </Box>
+                      <Box sx={{position: 'relative', display: 'flex', alignItems: 'center', flex: 1, margin: '0 0 0 5px'}}>
+                        {customDays[4][0] ?
+                          <>
+                            <Box sx={{flex: 1, margin: '0 5px', minWidth: '58px', maxWidth: '58px'}}>
+                              <SquareButton>
+                                <ReplayIcon/>
+                              </SquareButton>
+                            </Box>
+                            <Box sx={{position: 'relative', display: 'flex', width: '100%'}}>
+                              <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                  <TimePicker
+                                    value={customDays[4][1]}
+                                    onChange={(e) => handleChangeCustomDaysTimeStart(4, e)}
+                                  />
+                                </LocalizationProvider>
+                              </Box>
+                              <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                  <TimePicker
+                                    value={customDays[4][2]}
+                                    onChange={(e) => handleChangeCustomDaysTimeEnd(4, e)}
+                                  />
+                                </LocalizationProvider>
+                              </Box>
+                            </Box>
+                          </>
+                        :
+                          <div style={{
+                            position: 'absolute',
+                            top: 0,
+                            bottom: 0,
+                            left: '5px',
+                            right: '5px',
+                            padding: '0 10px',
+                            textAlign: 'center',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderRadius: '3px',
+                            border: '1px solid #edf2f6',
+                            //backgroundImage: `url(${"../../images/update_bg.jpg"})`,
+                            backgroundImage: `url(${require("../../images/update_bg.jpg")})`,
+                            backgroundRepeat: 'repeat',
+                          }}>
+                            <p style={{color: '#8796aa', fontWeight: '300', fontSize: '0.875rem'}}>Day Set To Closed</p>
+                          </div>
+                        }
+                      </Box>
+                    </Box>
+                    <Box sx={{display: 'flex', minHeight: '60px', margin: '0 0 10px'}}>
+                      <Box sx={{display: 'flex', alignItems: 'center', width: '210px', minWidth: '210px', margin: '0 5px 0 0'}}>
+                        <input
+                          style={{width: '32px', height: '32px'}}
+                          type="checkbox"
+                          checked={customDays[5][0] ? true : false}
+                          onChange={(e) => handleChangeCustomDays(5, e)}
+                        />
+                        <span style={{fontSize: '1.125rem', color: '#8796aa', paddingLeft: '18px'}}>Saturday</span>
+                      </Box>
+                      <Box sx={{position: 'relative', display: 'flex', alignItems: 'center', flex: 1, margin: '0 0 0 5px'}}>
+                        {customDays[5][0] ?
+                          <>
+                            <Box sx={{flex: 1, margin: '0 5px', minWidth: '58px', maxWidth: '58px'}}>
+                              <SquareButton>
+                                <ReplayIcon/>
+                              </SquareButton>
+                            </Box>
+                            <Box sx={{position: 'relative', display: 'flex', width: '100%'}}>
+                              <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                  <TimePicker
+                                    value={customDays[5][1]}
+                                    onChange={(e) => handleChangeCustomDaysTimeStart(5, e)}
+                                  />
+                                </LocalizationProvider>
+                              </Box>
+                              <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                  <TimePicker
+                                    value={customDays[5][2]}
+                                    onChange={(e) => handleChangeCustomDaysTimeEnd(5, e)}
+                                  />
+                                </LocalizationProvider>
+                              </Box>
+                            </Box>
+                          </>
+                        :
+                          <div style={{
+                            position: 'absolute',
+                            top: 0,
+                            bottom: 0,
+                            left: '5px',
+                            right: '5px',
+                            padding: '0 10px',
+                            textAlign: 'center',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderRadius: '3px',
+                            border: '1px solid #edf2f6',
+                            //backgroundImage: `url(${"../../images/update_bg.jpg"})`,
+                            backgroundImage: `url(${require("../../images/update_bg.jpg")})`,
+                            backgroundRepeat: 'repeat',
+                          }}>
+                            <p style={{color: '#8796aa', fontWeight: '300', fontSize: '0.875rem'}}>Day Set To Closed</p>
+                          </div>
+                        }
+                      </Box>
+                    </Box>
+                    <Box sx={{display: 'flex', minHeight: '60px', margin: '0 0 10px'}}>
+                      <Box sx={{display: 'flex', alignItems: 'center', width: '210px', minWidth: '210px', margin: '0 5px 0 0'}}>
+                        <input
+                          style={{width: '32px', height: '32px'}}
+                          type="checkbox"
+                          checked={customDays[6][0] ? true : false}
+                          onChange={(e) => handleChangeCustomDays(6, e)}
+                        />
+                        <span style={{fontSize: '1.125rem', color: '#8796aa', paddingLeft: '18px'}}>Sunday</span>
+                      </Box>
+                      <Box sx={{position: 'relative', display: 'flex', alignItems: 'center', flex: 1, margin: '0 0 0 5px'}}>
+                        {customDays[6][0] ?
+                            <>
+                              <Box sx={{flex: 1, margin: '0 5px', minWidth: '58px', maxWidth: '58px'}}>
+                                <SquareButton>
+                                  <ReplayIcon/>
+                                </SquareButton>
+                              </Box>
+                              <Box sx={{position: 'relative', display: 'flex', width: '100%'}}>
+                                <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <TimePicker
+                                      value={customDays[6][1]}
+                                      onChange={(e) => handleChangeCustomDaysTimeStart(6, e)}
+                                    />
+                                  </LocalizationProvider>
+                                </Box>
+                                <Box sx={{flex: 1, minWidth: '140px', margin: '0 5px'}}>
+                                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <TimePicker
+                                      value={customDays[6][2]}
+                                      onChange={(e) => handleChangeCustomDaysTimeEnd(6, e)}
+                                    />
+                                  </LocalizationProvider>
+                                </Box>
+                              </Box>
+                            </>
+                          :
+                            <div style={{
+                              position: 'absolute',
+                              top: 0,
+                              bottom: 0,
+                              left: '5px',
+                              right: '5px',
+                              padding: '0 10px',
+                              textAlign: 'center',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              borderRadius: '3px',
+                              border: '1px solid #edf2f6',
+                              backgroundImage: `url(${require("../../images/update_bg.jpg")})`,
+                              backgroundRepeat: 'repeat',
+                            }}>
+                              <p style={{color: '#8796aa', fontWeight: '300', fontSize: '0.875rem'}}>Day Set To Closed</p>
+                            </div>
+                        }
                       </Box>
                     </Box>
                   </Box>
                 </Box>
               </Box>
               <Box style={{maxWidth: '380px', margin: '70px auto 0'}}>
-                <AddButton sx={{width: '360px', height: '75px', marginBottom: '10px'}} onClick={() => alert('add')}>Update</AddButton>
-                <CancelButton sx={{width: '360px', height: '75px'}} onClick={() => handleCloseAddExemption()}>Cancel</CancelButton>
+                <AddButton sx={{width: '360px', height: '75px', marginBottom: '10px'}} onClick={() => addCustomAvailability()}>Update</AddButton>
+                {/* <AddButton sx={{width: '360px', height: '75px', marginBottom: '10px'}} onClick={() => console.log(customDays)}>Update</AddButton> */}
+                <CancelButton sx={{width: '360px', height: '75px'}} onClick={() => handleCloseAddCustomAvailability()}>Cancel</CancelButton>
               </Box>
             </Box>
           </Box>
@@ -1240,38 +2146,46 @@ function TowerCrane() {
               <CloseIcon/>
             </IconButton>
           </Box>
-          <Box sx={{padding: '70px 25px'}}>
+          <Box sx={{
+            padding: '70px 25px',
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'white',
+            overflowY: 'scroll',
+          }}>
             <Box sx={{maxWidth: '650px', margin: 'auto'}}>
               <h3 style={{textAlign: 'center', color: '#505e71', fontWeight: '600', fontSize: '2.125rem', marginBottom: '55px'}}>Set Custom Break Times</h3>
               <Box style={{margin: 'auto', maxWidth: '640px'}}>
                 <Box sx={{marginBottom: '15px'}}>
                   <span style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', marginBottom: '5px'}}>Break Description</span>
-                  <TextField sx={{width: '100%', height: '60px'}}/>
+                  <TextField
+                    value={breakTimeName}
+                    onChange={(e) => setBreakTimeName(e.target.value)}
+                    sx={{width: '100%', height: '60px'}}
+                  />
                 </Box>
                 {breakTimeField.map((element, index) => {
                   return (
                     <Box sx={{display: 'flex', alignItems: 'flex-end', margin: '5px 0'}}>
                       <Box sx={{flex: 1}}>
                         <span style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', marginBottom: '5px'}}>Time Start</span>
-                        <TextField
-                          sx={{width: '100%', height: '60px'}}
-                          InputProps={{startAdornment: (
-                            <InputAdornment position='start'>
-                              <AccessTimeIcon/>
-                            </InputAdornment>
-                          )}}
-                        />
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                          <TimePicker
+                            value={breakTimeField.time_start}
+                            onChange={(e) => handleChangeBreakTimeStart(index, e)}
+                            sx={{width: '100%', height: '60px'}}
+                          />
+                        </LocalizationProvider>
                       </Box>
                       <Box sx={{flex: 1, margin: '0 5px'}}>
                         <span style={{display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', marginBottom: '5px'}}>Time End</span>
-                        <TextField
-                          sx={{width: '100%', height: '60px'}}
-                          InputProps={{startAdornment: (
-                            <InputAdornment position='start'>
-                              <AccessTimeIcon/>
-                            </InputAdornment>
-                          )}}
-                        />
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                          <TimePicker
+                            value={breakTimeField.time_end}
+                            onChange={(e) => handleChangeBreakTimeEnd(index, e)}
+                            sx={{width: '100%', height: '60px'}}
+                          />
+                        </LocalizationProvider>
                       </Box>
                       {index ? 
                         <Box sx={{flex: 1, margin: '0 5px', minWidth: '60px', maxWidth: '60px'}}>
@@ -1296,8 +2210,8 @@ function TowerCrane() {
               </Box>
               </Box>
               <Box style={{maxWidth: '380px', margin: '70px auto 0'}}>
-                <AddButton sx={{width: '360px', height: '75px', marginBottom: '10px'}} onClick={() => alert('add')}>Update</AddButton>
-                <CancelButton sx={{width: '360px', height: '75px'}} onClick={() => handleCloseAddExemption()}>Cancel</CancelButton>
+                <AddButton sx={{width: '360px', height: '75px', marginBottom: '10px'}} onClick={() => addBreaktime()}>Update</AddButton>
+                <CancelButton sx={{width: '360px', height: '75px'}} onClick={() => handleCloseAddBreaktime()}>Cancel</CancelButton>
               </Box>
             </Box>
           </Box>

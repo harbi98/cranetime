@@ -15,11 +15,11 @@ return new class extends Migration
     {
         Schema::create('hours_custom_dates', function (Blueprint $table) {
             $table->id();
-            $table->integer('site_id');
-            $table->integer('actioner_id');
+            $table->integer('site_id')->nullable();
+            $table->integer('actioner_id')->nullable();
             $table->string('name');
             $table->date('date_start');
-            $table->date('date_end');
+            $table->date('date_to');
             $table->integer('asset_id');
             $table->timestamps();
         });
