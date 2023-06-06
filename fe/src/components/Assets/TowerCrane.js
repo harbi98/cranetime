@@ -212,12 +212,24 @@ function TowerCrane() {
     if(newValue === "6") {
       getMCranes();
     }
+    if(newValue === "7") {
+      getHoists();
+    }
+    if(newValue === "8") {
+      getMHandlings();
+    }
+    if(newValue === "9") {
+      getConcretePumps();
+    }
   };
 
   const [craneAssets, setCraneAssets] = useState([]);
   const [mCraneAssets, setMCraneAssets] = useState([]);
   const [deliveryBayAssets, setDeliveryBayAssets] = useState([]);
   const [loadingPlatformAssets, setLoadingPlatformAssets] = useState([]);
+  const [hoistAssets, setHoistAssets] = useState([]);
+  const [mHandlingAssets, setMHandlingAssets] = useState([]);
+  const [concretePupmAssets, setConcretePumpAssets] = useState([]);
 
   const [assetID, setAssetID] = useState();
   const [assetName, setAssetName] = useState('');
@@ -386,6 +398,54 @@ function TowerCrane() {
       })
       .then((res) => {
         setLoadingPlatformAssets(res.data.data);
+      })
+    } catch(e) {
+      console.log(e);
+    }
+  }
+  const getHoists = () => {
+    const headers = {
+      'Accept': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+    };
+    try {
+      axios.get('http://127.0.0.1:8000/api/assets/hoist', {
+        headers: headers
+      })
+      .then((res) => {
+        setHoistAssets(res.data.data);
+      })
+    } catch(e) {
+      console.log(e);
+    }
+  }
+  const getMHandlings = () => {
+    const headers = {
+      'Accept': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+    };
+    try {
+      axios.get('http://127.0.0.1:8000/api/assets/material_handling', {
+        headers: headers
+      })
+      .then((res) => {
+        setMHandlingAssets(res.data.data);
+      })
+    } catch(e) {
+      console.log(e);
+    }
+  }
+  const getConcretePumps = () => {
+    const headers = {
+      'Accept': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+    };
+    try {
+      axios.get('http://127.0.0.1:8000/api/assets/concrete', {
+        headers: headers
+      })
+      .then((res) => {
+        setConcretePumpAssets(res.data.data);
       })
     } catch(e) {
       console.log(e);
@@ -865,7 +925,7 @@ function TowerCrane() {
             <p style={{fontSize: '1.5rem', fontWeight: '300', color: '#505e71'}}>Delivery Bays</p>
           </Box>
           <Box sx={{display: 'flex', flexDirection: 'column', height: 'calc(100% - 75px)'}}>
-          {deliveryBayAssets.map((mcrane) => (
+          {deliveryBayAssets.map((bays) => (
             <Box sx={{display: 'block', borderBottom: '1px solid #edf2f6'}}>
               <div style={{minHeight: '95px', justifyContent: 'space-between', display: 'flex', alignItems: 'center'}}>
                 <div style={{paddingRight: '20px'}}>
@@ -883,10 +943,10 @@ function TowerCrane() {
                       borderRight: '1px solid #edf2f6'
                     }}>
                       {/* <img style={{overflowClipMargin: 'content-box', overflow: 'clip'}} src={require("../../icons/truck.png")} alt="Delivery Bays"/> */}
-                      <img style={{width: '32px', height: '32px', filter: "invert(73%) sepia(6%) saturate(1288%) hue-rotate(175deg) brightness(98%) contrast(82%)"}} src={require("../../icons/mcrane.png")} alt="Delivery Bays"/>
+                      <img style={{width: '32px', height: '32px', filter: "invert(73%) sepia(6%) saturate(1288%) hue-rotate(175deg) brightness(98%) contrast(82%)"}} src={require("../../icons/truck.png")} alt="Delivery Bays"/>
                     </div>
                     <div style={{display: 'block', boxSizing: 'border-box'}}>
-                      <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', marginBottom: '5px'}}>{mcrane.custom_name}</p>
+                      <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', marginBottom: '5px'}}>{bays.custom_name}</p>
                       <p style={{marginBottom: 0, display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem'}}>Est. Distance: [no data yet]</p>
                     </div>
                   </div>
@@ -921,7 +981,7 @@ function TowerCrane() {
       )
     } else if(tabIndex === "5") {
       return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', height: '100%', minWidth: '500px'}}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', height: '100%', minWidth: '500px', overflow: 'scroll'}}>
           <Box sx={{
               display: 'flex',
               alignItems: 'center',
@@ -953,7 +1013,7 @@ function TowerCrane() {
                       borderRight: '1px solid #edf2f6'
                     }}>
                       {/* <img style={{overflowClipMargin: 'content-box', overflow: 'clip'}} src={require("../../icons/truck.png")} alt="Delivery Bays"/> */}
-                      <img style={{width: '32px', height: '32px', filter: "invert(73%) sepia(6%) saturate(1288%) hue-rotate(175deg) brightness(98%) contrast(82%)"}} src={require("../../icons/mcrane.png")} alt="Delivery Bays"/>
+                      <img style={{width: '32px', height: '32px', filter: "invert(73%) sepia(6%) saturate(1288%) hue-rotate(175deg) brightness(98%) contrast(82%)"}} src={require("../../icons/platform.png")} alt="Loading Platform"/>
                     </div>
                     <div style={{display: 'block', boxSizing: 'border-box'}}>
                       <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', marginBottom: '5px'}}>{platform.custom_name}</p>
@@ -1023,7 +1083,7 @@ function TowerCrane() {
                       borderRight: '1px solid #edf2f6'
                     }}>
                       {/* <img style={{overflowClipMargin: 'content-box', overflow: 'clip'}} src={require("../../icons/truck.png")} alt="Delivery Bays"/> */}
-                      <img style={{width: '32px', height: '32px', filter: "invert(73%) sepia(6%) saturate(1288%) hue-rotate(175deg) brightness(98%) contrast(82%)"}} src={require("../../icons/mcrane.png")} alt="Delivery Bays"/>
+                      <img style={{width: '32px', height: '32px', filter: "invert(73%) sepia(6%) saturate(1288%) hue-rotate(175deg) brightness(98%) contrast(82%)"}} src={require("../../icons/mcrane.png")} alt="Mobile Crane"/>
                     </div>
                     <div style={{display: 'block', boxSizing: 'border-box'}}>
                       <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', marginBottom: '5px'}}>{mcrane.custom_name}</p>
@@ -1061,7 +1121,7 @@ function TowerCrane() {
       )
     } else if(tabIndex === "7") {
       return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', height: '100%', minWidth: '500px'}}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', height: '100%', minWidth: '500px', overflow: 'scroll'}}>
           <Box sx={{
               display: 'flex',
               alignItems: 'center',
@@ -1074,11 +1134,64 @@ function TowerCrane() {
           >
             <p style={{fontSize: '1.5rem', fontWeight: '300', color: '#505e71'}}>Hoist</p>
           </Box>
+          <Box sx={{display: 'flex', flexDirection: 'column', height: 'calc(100% - 75px)'}}>
+          {hoistAssets.map((hoist) => (
+            <Box sx={{display: 'block', borderBottom: '1px solid #edf2f6'}}>
+              <div style={{minHeight: '95px', justifyContent: 'space-between', display: 'flex', alignItems: 'center'}}>
+                <div style={{paddingRight: '20px'}}>
+                  <div style={{display: 'flex', alignItems: 'center'}}>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      boxSizing: 'border-box',
+                      height: '35px',
+                      minWidth: '80px',
+                      width: '80px',
+                      textAlign: 'center',
+                      justifyContent: 'center',
+                      marginRight: '20px',
+                      borderRight: '1px solid #edf2f6'
+                    }}>
+                      {/* <img style={{overflowClipMargin: 'content-box', overflow: 'clip'}} src={require("../../icons/truck.png")} alt="Delivery Bays"/> */}
+                      <img style={{width: '32px', height: '32px', filter: "invert(73%) sepia(6%) saturate(1288%) hue-rotate(175deg) brightness(98%) contrast(82%)"}} src={require("../../icons/elevator.png")} alt="Hoist"/>
+                    </div>
+                    <div style={{display: 'block', boxSizing: 'border-box'}}>
+                      <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', marginBottom: '5px'}}>{hoist.custom_name}</p>
+                      <p style={{marginBottom: 0, display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem'}}>Est. Distance: [no data yet]</p>
+                    </div>
+                  </div>
+                </div>
+                <div style={{display: 'flex', paddingRight: '30px', alignItems: 'center'}}>
+                  <span style={{padding: '0 20px 0 0', fontWeight: '300', fontSize: '1.125rem', color: '#505e71'}}>
+                    Reachable
+                  </span>
+                  <input
+                    style={{width: '32px', height: '32px', margin: 'auto'}}
+                    type="checkbox"
+                  />
+                </div> 
+              </div>
+              <div style={{padding: '0 30px 30px'}}>
+                <div style={{
+                  minHeight: 400,
+                  backgroundImage: `url(${require("../../images/map.jpg")})`,
+                  backgroundPosition: 'right top',
+                  backgroundRepeat: 'no-repeat',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  borderRadius: '3px'
+                }}>
+
+                </div>
+              </div>
+            </Box>
+          ))}
+          </Box>
         </Box>
       )
     } else if(tabIndex === "8") {
       return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', height: '100%', minWidth: '500px'}}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', height: '100%', minWidth: '500px', overflow: 'scroll'}}>
           <Box sx={{
               display: 'flex',
               alignItems: 'center',
@@ -1091,11 +1204,64 @@ function TowerCrane() {
           >
             <p style={{fontSize: '1.5rem', fontWeight: '300', color: '#505e71'}}>Material Handling</p>
           </Box>
+          <Box sx={{display: 'flex', flexDirection: 'column', height: 'calc(100% - 75px)'}}>
+          {mHandlingAssets.map((handler) => (
+            <Box sx={{display: 'block', borderBottom: '1px solid #edf2f6'}}>
+              <div style={{minHeight: '95px', justifyContent: 'space-between', display: 'flex', alignItems: 'center'}}>
+                <div style={{paddingRight: '20px'}}>
+                  <div style={{display: 'flex', alignItems: 'center'}}>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      boxSizing: 'border-box',
+                      height: '35px',
+                      minWidth: '80px',
+                      width: '80px',
+                      textAlign: 'center',
+                      justifyContent: 'center',
+                      marginRight: '20px',
+                      borderRight: '1px solid #edf2f6'
+                    }}>
+                      {/* <img style={{overflowClipMargin: 'content-box', overflow: 'clip'}} src={require("../../icons/truck.png")} alt="Delivery Bays"/> */}
+                      <img style={{width: '32px', height: '32px', filter: "invert(73%) sepia(6%) saturate(1288%) hue-rotate(175deg) brightness(98%) contrast(82%)"}} src={require("../../icons/lifter.png")} alt="Handler"/>
+                    </div>
+                    <div style={{display: 'block', boxSizing: 'border-box'}}>
+                      <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', marginBottom: '5px'}}>{handler.custom_name}</p>
+                      <p style={{marginBottom: 0, display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem'}}>Est. Distance: [no data yet]</p>
+                    </div>
+                  </div>
+                </div>
+                <div style={{display: 'flex', paddingRight: '30px', alignItems: 'center'}}>
+                  <span style={{padding: '0 20px 0 0', fontWeight: '300', fontSize: '1.125rem', color: '#505e71'}}>
+                    Reachable
+                  </span>
+                  <input
+                    style={{width: '32px', height: '32px', margin: 'auto'}}
+                    type="checkbox"
+                  />
+                </div> 
+              </div>
+              <div style={{padding: '0 30px 30px'}}>
+                <div style={{
+                  minHeight: 400,
+                  backgroundImage: `url(${require("../../images/map.jpg")})`,
+                  backgroundPosition: 'right top',
+                  backgroundRepeat: 'no-repeat',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  borderRadius: '3px'
+                }}>
+
+                </div>
+              </div>
+            </Box>
+          ))}
+          </Box>
         </Box>
       )
     } else if(tabIndex === "9") {
       return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', height: '100%', minWidth: '500px'}}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', height: '100%', minWidth: '500px', overflow: 'scroll'}}>
           <Box sx={{
               display: 'flex',
               alignItems: 'center',
@@ -1108,11 +1274,64 @@ function TowerCrane() {
           >
             <p style={{fontSize: '1.5rem', fontWeight: '300', color: '#505e71'}}>Concrete Pumps</p>
           </Box>
+          <Box sx={{display: 'flex', flexDirection: 'column', height: 'calc(100% - 75px)'}}>
+          {concretePupmAssets.map((concrete) => (
+            <Box sx={{display: 'block', borderBottom: '1px solid #edf2f6'}}>
+              <div style={{minHeight: '95px', justifyContent: 'space-between', display: 'flex', alignItems: 'center'}}>
+                <div style={{paddingRight: '20px'}}>
+                  <div style={{display: 'flex', alignItems: 'center'}}>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      boxSizing: 'border-box',
+                      height: '35px',
+                      minWidth: '80px',
+                      width: '80px',
+                      textAlign: 'center',
+                      justifyContent: 'center',
+                      marginRight: '20px',
+                      borderRight: '1px solid #edf2f6'
+                    }}>
+                      {/* <img style={{overflowClipMargin: 'content-box', overflow: 'clip'}} src={require("../../icons/truck.png")} alt="Delivery Bays"/> */}
+                      <img style={{width: '32px', height: '32px', filter: "invert(73%) sepia(6%) saturate(1288%) hue-rotate(175deg) brightness(98%) contrast(82%)"}} src={require("../../icons/concrete-truck.png")} alt="Concrete Pump"/>
+                    </div>
+                    <div style={{display: 'block', boxSizing: 'border-box'}}>
+                      <p style={{color: '#505e71', fontWeight: '300', fontSize: '1.125rem', marginBottom: '5px'}}>{concrete.custom_name}</p>
+                      <p style={{marginBottom: 0, display: 'inline-block', color: '#889ab1', fontWeight: '300', fontSize: '0.875rem'}}>Est. Distance: [no data yet]</p>
+                    </div>
+                  </div>
+                </div>
+                <div style={{display: 'flex', paddingRight: '30px', alignItems: 'center'}}>
+                  <span style={{padding: '0 20px 0 0', fontWeight: '300', fontSize: '1.125rem', color: '#505e71'}}>
+                    Reachable
+                  </span>
+                  <input
+                    style={{width: '32px', height: '32px', margin: 'auto'}}
+                    type="checkbox"
+                  />
+                </div> 
+              </div>
+              <div style={{padding: '0 30px 30px'}}>
+                <div style={{
+                  minHeight: 400,
+                  backgroundImage: `url(${require("../../images/map.jpg")})`,
+                  backgroundPosition: 'right top',
+                  backgroundRepeat: 'no-repeat',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  borderRadius: '3px'
+                }}>
+
+                </div>
+              </div>
+            </Box>
+          ))}
+          </Box>
         </Box>
       )
     } else if(tabIndex === "10") {
       return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', width: '100%', overflowY: 'scroll'}}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', flex: '1', height: '100%', minWidth: '500px', overflow: 'scroll'}}>
           <Box sx={{
               display: 'flex',
               alignItems: 'center',
@@ -1266,7 +1485,7 @@ function TowerCrane() {
               ),
             }}
             onChange={(e) => searchAsset(e.target.value)}
-            />
+          />
         </Box>
         <Box display="flex" sx={{
           height: '100%',
@@ -1330,7 +1549,7 @@ function TowerCrane() {
                 borderBottom: 1,
                 borderBottomColor: '#edf2f6'
               }}>
-                <Typography sx={{display: 'inline-block', fontWeight: 300, fontSize: '0.875rem', color: '#889ab1'}}>Crane Settings</Typography>
+                <Typography sx={{display: 'inline-block', fontWeight: 300, fontSize: '0.875rem', color: '#889ab1'}}>Asset Settings</Typography>
               </Box>
               <Box display="block">
                 <AntTabs

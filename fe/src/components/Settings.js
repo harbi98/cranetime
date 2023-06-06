@@ -40,7 +40,7 @@ function Settings() {
           PaperProps={{
             sx: {
               position: "absolute",
-              marginLeft: '75px',
+              marginLeft: '70px',
               backgroundColor: '#252529',
             }
           }}
