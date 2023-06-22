@@ -234,10 +234,13 @@ function DeliveryBays() {
   const [concretePupmAssets, setConcretePumpAssets] = useState([]);
 
   const [assetID, setAssetID] = useState();
+
+  // view asset details
   const [assetName, setAssetName] = useState('');
   const [assetMaxLength, setAssetMaxLength] = useState('');
   const [assetUnit, setAssetUnit] = useState('');
 
+  // add asset
   const [customName, setCustomName] = useState();
   const [maxLength, setMaxLength] = useState();
   const [unit, setUnit] = useState();
@@ -317,7 +320,17 @@ function DeliveryBays() {
 
   const [openSetName, setOpenSetName] = useState(false);
   const handleOpenSetName = () => setOpenSetName(true);
-  const handleCloseSetName = () => setOpenSetName(false);
+  const handleCloseSetName = () => {
+    setOpenSetName(false);
+    showAsset(assetID);
+  }
+
+  const [openSetMaxLengthUnit, setOpenSetMaxLengthUnit] = useState(false);
+  const handleOpenSetMaxLengthUnit = () => setOpenSetMaxLengthUnit(true);
+  const handleCloseSetMaxLengthUnit = () => {
+    setOpenSetMaxLengthUnit(false);
+    showAsset(assetID);
+  }
 
   const [openAddCustomAvailability, setOpenAddCustomAvailability] = useState(false);
   const handleOpenAddCustomAvailability = () => setOpenAddCustomAvailability(true);
@@ -336,7 +349,7 @@ function DeliveryBays() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.get('http://127.0.0.1:8000/api/assets/bays', {
+      axios.get('http://127.0.0.1:8000/api/assets/bay', {
         headers: headers
       })
       .then((res) => {
@@ -384,7 +397,7 @@ function DeliveryBays() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.get('http://127.0.0.1:8000/api/assets/loading_platform', {
+      axios.get('http://127.0.0.1:8000/api/assets/platform', {
         headers: headers
       })
       .then((res) => {
@@ -416,7 +429,7 @@ function DeliveryBays() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.get('http://127.0.0.1:8000/api/assets/material_handling', {
+      axios.get('http://127.0.0.1:8000/api/assets/mhandling', {
         headers: headers
       })
       .then((res) => {
@@ -454,13 +467,13 @@ function DeliveryBays() {
       .then((res) => {
         setAssetID(res.data.data.id);
         setAssetName(res.data.data.custom_name);
-        setCustomName(res.data.data.custom_name);
+        //setCustomName(res.data.data.custom_name);
 
-        setAssetMaxLength(res.data.data.max_length);
-        setMaxLength(res.data.data.max_length);
+        setAssetMaxLength(res.data.data.maximum_length_num);
+        //setMaxLength(res.data.data.maximum_length_num);
 
-        setAssetUnit(res.data.data.unit);
-        setUnit(res.data.data.unit);
+        setAssetUnit(res.data.data.maximum_length_unit);
+        //setUnit(res.data.data.maximum_length_unit);
 
         setTabIndex("1");
       })
@@ -474,7 +487,7 @@ function DeliveryBays() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.get('http://127.0.0.1:8000/api/assets/bays', {
+      axios.get('http://127.0.0.1:8000/api/assets/bay', {
         headers: headers
       })
       .then((res) => {
@@ -486,11 +499,24 @@ function DeliveryBays() {
     }
   }
   const addAsset = () => {
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = today.getFullYear();
+    var hour = today.getHours();
+    var minutes = today.getMinutes();
+    var seconds = today.getSeconds();
+
+    today = yyyy + '-' + mm + '-' + dd + ' ' + hour + ':' + minutes + ':' + seconds;
     const data = {
+      created: today,
+      name: 1,
       custom_name: customName,
+      make: "N/A",
+      model: "N/A",
       max_length: maxLength,
       unit: unit,
-      type: 'bays',
+      type: 'bay',
     };
     const headers = {
       'Content-Type': 'application/json',
@@ -512,7 +538,7 @@ function DeliveryBays() {
   }
   const editAssetName = () => {
     const data = {
-      custom_name: customName,
+      custom_name: assetName,
     };
     const headers = {
       'Content-Type': 'application/json',
@@ -523,8 +549,33 @@ function DeliveryBays() {
         headers: headers
       })
       .then((res) => {
-        console.log(res.data.message);
+        alert(res.data.message);
+
         handleCloseSetName();
+        showAssets();
+        showAsset(assetID);
+      })
+    } catch(e) {
+      console.log(e);
+    }
+  }
+  const editAssetMaxLengthUnit = () => {
+    const data = {
+      max_length: assetMaxLength,
+      unit: assetUnit,
+    };
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+    };
+    try {
+      axios.put('http://127.0.0.1:8000/api/asset/'+assetID+'/edit-max_length-unit', data, {
+        headers: headers
+      })
+      .then((res) => {
+        alert(res.data.message);
+
+        handleCloseSetMaxLengthUnit();
         showAssets();
         showAsset(assetID);
       })
@@ -559,7 +610,7 @@ function DeliveryBays() {
                 <p style={{fontSize: '1.125rem', fontWeight: '200', color: '#505e71', textOverflow: 'ellipsis', overflow: 'hidden'}}>{assetName ? assetName : 'N/A'}</p>
               </Box>
               <Box sx={{ display: 'flex', width: '100px', borderLeft: 2, borderColor: '#edf2f6', alignItems: 'center', justifyContent: 'center'}}>
-                <IconButton onClick={() => {handleOpenSetName()}}>
+                <IconButton onClick={() => handleOpenSetName()}>
                   <EditIcon sx={{color: '#808080'}}/>
                 </IconButton>
               </Box>
@@ -570,7 +621,7 @@ function DeliveryBays() {
                 <p style={{fontSize: '1.125rem', fontWeight: '200', color: '#505e71', textOverflow: 'ellipsis', overflow: 'hidden'}}>{assetMaxLength ? assetMaxLength : 'N/A'} {assetUnit ? assetUnit : 'N/A'}</p>
               </Box>
               <Box sx={{ display: 'flex', width: '100px', borderLeft: 2, borderColor: '#edf2f6', alignItems: 'center', justifyContent: 'center'}}>
-                <IconButton>
+                <IconButton onClick={() => handleOpenSetMaxLengthUnit()}>
                   <EditIcon sx={{color: '#808080'}}/>
                 </IconButton>
               </Box>
@@ -1391,25 +1442,25 @@ function DeliveryBays() {
       >
         <Box sx={style}>
           <Box borderBottom={2} borderColor='#e0e0e0' sx={{display: 'flex', width: '100%', height: '75px', justifyContent: 'flex-end', padding: '10px'}}>
-            <IconButton onClick={() => handleClose()}>
+            <IconButton sx={{alignSelf: 'center'}} onClick={() => handleClose()}>
               <CloseIcon/>
             </IconButton>
           </Box>
           <Box sx={{display: 'flex', margin: '50px 20px', alignItems: 'center', flexDirection: 'column'}}>
-              <Typography>Add Delivery Bay</Typography>
+              <h3 style={{textAlign: 'center', color: '#505e71', fontWeight: '600', fontSize: '2.125rem', marginBottom: '55px'}}>Add Delivery Bay</h3>
               <Box>
-                <Typography>Name</Typography>
-                <TextField sx={{width: '360px'}} onChange={(e) => setCustomName(e.target.value)}/>
+                <p style={{color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', marginBottom: '5px'}}>Name</p>
+                <TextField sx={{width: '360px'}} value={customName} onChange={(e) => setCustomName(e.target.value)}/>
               </Box>
               <Box>
-                <Typography>Maximum Length</Typography>
-                <TextField sx={{width: '360px'}} onChange={(e) => setMaxLength(e.target.value)}/>
+                <p style={{color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', marginBottom: '5px'}}>Maximum Length</p>
+                <TextField sx={{width: '360px'}} value={maxLength} onChange={(e) => setMaxLength(e.target.value)}/>
               </Box>
               <Box>
-                <Typography>Unit</Typography>
+                <p style={{color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', marginBottom: '5px'}}>Unit</p>
                 <Autocomplete
                   disablePortal
-                  //value={value}
+                  value={unit}
                   onChange={(event, newValue) => {setUnit(newValue)}}
                   //inputValue={inputValue}
                   id="controllable-states-demo"
@@ -1439,10 +1490,10 @@ function DeliveryBays() {
             </IconButton>
           </Box>
           <Box sx={{display: 'flex', margin: '50px 20px', alignItems: 'center', flexDirection: 'column'}}>
-              <Typography>Set Mobile Crane Name</Typography>
+              <Typography>Set Delivery Bay Name</Typography>
               <Box>
                 <Typography>Name</Typography>
-                <TextField sx={{width: '360px'}} value={customName} onChange={(e) => setCustomName(e.target.value)}/>
+                <TextField sx={{width: '360px'}} value={assetName} onChange={(e) => setAssetName(e.target.value)}/>
               </Box>
               <Box sx={{display: 'flex', marginTop: '50px', flexDirection: 'column'}}>
                 <Box sx={{marginTop: '10px'}}>
@@ -1450,6 +1501,45 @@ function DeliveryBays() {
                 </Box>
                 <Box sx={{marginTop: '10px'}}>
                   <CancelButton sx={{width: '360px', height: '75px'}} onClick={() => handleCloseSetName()}>Cancel</CancelButton>
+                </Box>
+              </Box>
+          </Box>
+        </Box>
+      </Modal>
+      <Modal
+        open={openSetMaxLengthUnit}
+      >
+        <Box sx={style}>
+          <Box borderBottom={2} borderColor='#e0e0e0' sx={{display: 'flex', width: '100%', height: '75px', justifyContent: 'flex-end', padding: '10px'}}>
+            <IconButton sx={{alignSelf: 'center'}} onClick={() => handleCloseSetMaxLengthUnit()}>
+              <CloseIcon/>
+            </IconButton>
+          </Box>
+          <Box sx={{display: 'flex', margin: '50px 20px', alignItems: 'center', flexDirection: 'column'}}>
+              <h3 style={{textAlign: 'center', color: '#505e71', fontWeight: '600', fontSize: '2.125rem', marginBottom: '55px'}}>Set Maximum Length & Unit</h3>
+              <Box>
+                <p style={{color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', marginBottom: '5px'}}>Maximum Length</p>
+                <TextField sx={{width: '360px'}} value={assetMaxLength} onChange={(e) => setAssetMaxLength(e.target.value)}/>
+              </Box>
+              <Box>
+                <p style={{color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', marginBottom: '5px'}}>Unit</p>
+                <Autocomplete
+                  disablePortal
+                  value={assetUnit}
+                  onChange={(event, newValue) => {setAssetUnit(newValue)}}
+                  //inputValue={inputValue}
+                  id="controllable-states-demo"
+                  options={options}
+                  sx={{ width: '360px' }}
+                  renderInput={(params) => <TextField {...params} placeholder='Select...'/>}
+                />
+              </Box>
+              <Box sx={{display: 'flex', marginTop: '50px', flexDirection: 'column'}}>
+                <Box sx={{marginTop: '10px'}}>
+                  <AddButton sx={{width: '360px', height: '75px'}} onClick={() => editAssetMaxLengthUnit()}>Update</AddButton>
+                </Box>
+                <Box sx={{marginTop: '10px'}}>
+                  <CancelButton sx={{width: '360px', height: '75px'}} onClick={() => handleCloseSetMaxLengthUnit()}>Cancel</CancelButton>
                 </Box>
               </Box>
           </Box>

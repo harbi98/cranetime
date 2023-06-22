@@ -13,9 +13,12 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
+            'created' => 'required',
             'email' => 'required|email',
-            'type' => 'required',
+            'phone' => 'required',
+            'phone_code' => 'required',
+            'name_first' => 'required',
+            'name_last' => 'required',
             'password' => 'required',
             'c_password' => 'required|same:password',
         ]);
@@ -27,10 +30,21 @@ class AuthController extends Controller
             ], 422);    
         } else {
             $user = User::create([
-                'name' => $request->name,
+                'actioner_id' => 1900,
+                'created' => $request->created,
+                'status' => 1,
+                'logged_in' => 0,
+                'verified' => 1,
                 'email' => $request->email,
-                'type' => $request->type,
+                'phone' => $request->phone,
+                'phone_code' => $request->phone_code,
                 'password' => bcrypt($request->password),
+                'password_reset_hash' => "",
+                'password_reset_amount' => 0,
+                'image' => "",
+                'name_first' => $request->name_first,
+                'name_last' => $request->name_last,
+                'admin_access' => 1,
             ]);
             if($user) {
                 return response()->json([
@@ -60,10 +74,11 @@ class AuthController extends Controller
             if(Auth::attempt(['email' => $request->email, 'password' => $request->password])){ 
                 $user = Auth::user();
     
-                $success['name'] =  $user->name;
+                $success['name_first'] =  $user->name_first;
+                $success['name_last'] =  $user->name_first;
                 $success['email'] =  $user->email;
-                $success['type'] =  $user->type;
-                $success['token'] =  $user->createToken('MyApp')->accessToken; 
+                $success['admin_access'] =  $user->admin_access;
+                $success['token'] =  $user->createToken('Cranetime')->accessToken; 
      
                 return response()->json([
                     'status' => 200,

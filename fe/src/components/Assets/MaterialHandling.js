@@ -235,6 +235,8 @@ function MaterialHandling() {
 
   const [assetID, setAssetID] = useState();
   const [assetName, setAssetName] = useState('');
+  const [assetModel, setAssetModel] = useState('');
+  const [assetMake, setAssetMake] = useState('');
 
   const [customName, setCustomName] = useState();
   const [make, setMake] = useState();
@@ -311,7 +313,17 @@ function MaterialHandling() {
 
   const [openSetName, setOpenSetName] = useState(false);
   const handleOpenSetName = () => setOpenSetName(true);
-  const handleCloseSetName = () => setOpenSetName(false);
+  const handleCloseSetName = () => {
+    setOpenSetName(false);
+    showAsset(assetID);
+  }
+
+  const [openSetMakeModel, setOpenSetMakeModel] = useState(false);
+  const handleOpenSetMakeModel = () => setOpenSetMakeModel(true);
+  const handleCloseSetMakeModel = () => {
+    setOpenSetMakeModel(false);
+    showAsset(assetID);
+  }
 
   const [openAddCustomAvailability, setOpenAddCustomAvailability] = useState(false);
   const handleOpenAddCustomAvailability = () => setOpenAddCustomAvailability(true);
@@ -330,7 +342,7 @@ function MaterialHandling() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.get('http://127.0.0.1:8000/api/assets/material_handling', {
+      axios.get('http://127.0.0.1:8000/api/assets/mhandling', {
         headers: headers
       })
       .then((res) => {
@@ -378,7 +390,7 @@ function MaterialHandling() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.get('http://127.0.0.1:8000/api/assets/bays', {
+      axios.get('http://127.0.0.1:8000/api/assets/bay', {
         headers: headers
       })
       .then((res) => {
@@ -410,7 +422,7 @@ function MaterialHandling() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.get('http://127.0.0.1:8000/api/assets/loading_platform', {
+      axios.get('http://127.0.0.1:8000/api/assets/platform', {
         headers: headers
       })
       .then((res) => {
@@ -447,8 +459,11 @@ function MaterialHandling() {
       })
       .then((res) => {
         setAssetID(res.data.data.id);
+
         setAssetName(res.data.data.custom_name);
-        setCustomName(res.data.data.custom_name);
+        setAssetMake(res.data.data.make);
+        setAssetModel(res.data.data.model);
+
         setTabIndex("1");
       })
     } catch(e) {
@@ -461,7 +476,7 @@ function MaterialHandling() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.get('http://127.0.0.1:8000/api/assets/material_handling', {
+      axios.get('http://127.0.0.1:8000/api/assets/mhandling', {
         headers: headers
       })
       .then((res) => {
@@ -473,11 +488,24 @@ function MaterialHandling() {
     }
   }
   const addAsset = () => {
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = today.getFullYear();
+    var hour = today.getHours();
+    var minutes = today.getMinutes();
+    var seconds = today.getSeconds();
+
+    today = yyyy + '-' + mm + '-' + dd + ' ' + hour + ':' + minutes + ':' + seconds;
     const data = {
+      created: today,
+      name: 1,
       custom_name: customName,
       make: make,
       model: model,
-      type: 'material_handling',
+      max_length: "-",
+      unit: "-",
+      type: 'mhandling',
     };
     const headers = {
       'Content-Type': 'application/json',
@@ -489,9 +517,18 @@ function MaterialHandling() {
       })
       .then((res) => {
         console.log(res.data.message);
+
+        setCustomName();
+        setMake();
+        setModel();
+
         handleClose();
         showAssets();
         showAsset_onLoad();
+      })
+      .catch((error) => {
+        if(error.response.status === 500) alert(JSON.stringify(error.response.data.message));
+        if(error.response.status === 422) alert(JSON.stringify(error.response.data.message));
       })
     } catch(e) {
       console.log(e);
@@ -499,7 +536,7 @@ function MaterialHandling() {
   }
   const editAssetName = () => {
     const data = {
-      custom_name: customName,
+      custom_name: assetName,
     };
     const headers = {
       'Content-Type': 'application/json',
@@ -510,8 +547,31 @@ function MaterialHandling() {
         headers: headers
       })
       .then((res) => {
-        console.log(res.data.message);
+        alert(res.data.message);
         handleCloseSetName();
+        showAssets();
+        showAsset(assetID);
+      })
+    } catch(e) {
+      console.log(e);
+    }
+  }
+  const editAssetMakeModel = () => {
+    const data = {
+      make: assetMake,
+      model: assetModel,
+    };
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+    };
+    try {
+      axios.put('http://127.0.0.1:8000/api/asset/'+assetID+'/edit-make-model', data, {
+        headers: headers
+      })
+      .then((res) => {
+        alert(res.data.message);
+        handleCloseSetMakeModel();
         showAssets();
         showAsset(assetID);
       })
@@ -547,6 +607,17 @@ function MaterialHandling() {
               </Box>
               <Box sx={{ display: 'flex', width: '100px', borderLeft: 2, borderColor: '#edf2f6', alignItems: 'center', justifyContent: 'center'}}>
                 <IconButton onClick={() => {handleOpenSetName()}}>
+                  <EditIcon sx={{color: '#808080'}}/>
+                </IconButton>
+              </Box>
+            </Box>
+            <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between', borderBottom: 2, borderColor: '#edf2f6', padding: '30px' }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', justifyContent: 'center'}}>
+                <p style={{fontSize: '0.875rem', color: '#889ab1', fontWeight: '300', marginBottom: '5px'}}>Make  Model</p>
+                <p style={{fontSize: '1.125rem', fontWeight: '200', color: '#505e71', textOverflow: 'ellipsis', overflow: 'hidden'}}>{assetMake ? assetMake : 'N/A'} - {assetModel ? assetModel : 'N/A'}</p>
+              </Box>
+              <Box sx={{ display: 'flex', width: '100px', borderLeft: 2, borderColor: '#edf2f6', alignItems: 'center', justifyContent: 'center'}}>
+                <IconButton onClick={() => handleOpenSetMakeModel()}>
                   <EditIcon sx={{color: '#808080'}}/>
                 </IconButton>
               </Box>
@@ -1367,23 +1438,23 @@ function MaterialHandling() {
       >
         <Box sx={style}>
           <Box borderBottom={2} borderColor='#e0e0e0' sx={{display: 'flex', width: '100%', height: '75px', justifyContent: 'flex-end', padding: '10px'}}>
-            <IconButton onClick={() => handleClose()}>
+            <IconButton sx={{alignSelf: 'center'}} onClick={() => handleClose()}>
               <CloseIcon/>
             </IconButton>
           </Box>
           <Box sx={{display: 'flex', margin: '50px 20px', alignItems: 'center', flexDirection: 'column'}}>
-              <Typography>Add Material Handling</Typography>
+              <h3 style={{textAlign: 'center', color: '#505e71', fontWeight: '600', fontSize: '2.125rem', marginBottom: '55px'}}>Add Material Handling</h3>
               <Box>
-                <Typography>Name</Typography>
-                <TextField sx={{width: '360px'}} onChange={(e) => setCustomName(e.target.value)}/>
+                <p style={{color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', marginBottom: '5px'}}>Name</p>
+                <TextField sx={{width: '360px'}} value={customName} onChange={(e) => setCustomName(e.target.value)}/>
               </Box>
               <Box>
-                <Typography>Crane Manufacturer</Typography>
-                <TextField sx={{width: '360px'}} onChange={(e) => setMake(e.target.value)}/>
+                <p style={{color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', marginBottom: '5px'}}>Crane Manufacturer</p>
+                <TextField sx={{width: '360px'}} value={make} onChange={(e) => setMake(e.target.value)}/>
               </Box>
               <Box>
-                <Typography>Model</Typography>
-                <TextField sx={{width: '360px'}} onChange={(e) => setModel(e.target.value)}/>
+                <p style={{color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', marginBottom: '5px'}}>Model</p>
+                <TextField sx={{width: '360px'}} value={model} onChange={(e) => setModel(e.target.value)}/>
               </Box>
               <Box sx={{display: 'flex', marginTop: '50px', flexDirection: 'column'}}>
                 <Box sx={{marginTop: '10px'}}>
@@ -1401,15 +1472,15 @@ function MaterialHandling() {
       >
         <Box sx={style}>
           <Box borderBottom={2} borderColor='#e0e0e0' sx={{display: 'flex', width: '100%', height: '75px', justifyContent: 'flex-end', padding: '10px'}}>
-            <IconButton onClick={() => handleCloseSetName()}>
+            <IconButton sx={{alignSelf: 'center'}} onClick={() => handleCloseSetName()}>
               <CloseIcon/>
             </IconButton>
           </Box>
           <Box sx={{display: 'flex', margin: '50px 20px', alignItems: 'center', flexDirection: 'column'}}>
-              <Typography>Set Mobile Crane Name</Typography>
+              <h3 style={{textAlign: 'center', color: '#505e71', fontWeight: '600', fontSize: '2.125rem', marginBottom: '55px'}}>Set Handler Name</h3>
               <Box>
-                <Typography>Name</Typography>
-                <TextField sx={{width: '360px'}} value={customName} onChange={(e) => setCustomName(e.target.value)}/>
+                <p style={{color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', marginBottom: '5px'}}>Name</p>
+                <TextField sx={{width: '360px'}} value={assetName} onChange={(e) => setAssetName(e.target.value)}/>
               </Box>
               <Box sx={{display: 'flex', marginTop: '50px', flexDirection: 'column'}}>
                 <Box sx={{marginTop: '10px'}}>
@@ -1417,6 +1488,38 @@ function MaterialHandling() {
                 </Box>
                 <Box sx={{marginTop: '10px'}}>
                   <CancelButton sx={{width: '360px', height: '75px'}} onClick={() => handleCloseSetName()}>Cancel</CancelButton>
+                </Box>
+              </Box>
+          </Box>
+        </Box>
+      </Modal>
+      <Modal
+        open={openSetMakeModel}
+      >
+        <Box sx={style}>
+          <Box borderBottom={2} borderColor='#e0e0e0' sx={{display: 'flex', width: '100%', height: '75px', justifyContent: 'flex-end', padding: '10px'}}>
+            <IconButton sx={{alignSelf: 'center'}} onClick={() => handleCloseSetMakeModel()}>
+              <CloseIcon/>
+            </IconButton>
+          </Box>
+          <Box sx={{display: 'flex', margin: '50px 20px', alignItems: 'center', flexDirection: 'column'}}>
+              <h3 style={{textAlign: 'center', color: '#505e71', fontWeight: '600', fontSize: '2.125rem', marginBottom: '55px'}}>Set Make & Model</h3>
+              <Box>
+                <Box>
+                  <p style={{color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', marginBottom: '5px'}}>Crane Manufacturer</p>
+                  <TextField sx={{width: '360px'}} value={assetMake} onChange={(e) => setAssetMake(e.target.value)}/>
+                </Box>
+                <Box>
+                  <p style={{color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', marginBottom: '5px'}}>Model</p>
+                  <TextField sx={{width: '360px'}} value={assetModel} onChange={(e) => setAssetModel(e.target.value)}/>
+                </Box>
+              </Box>
+              <Box sx={{display: 'flex', marginTop: '50px', flexDirection: 'column'}}>
+                <Box sx={{marginTop: '10px'}}>
+                  <AddButton sx={{width: '360px', height: '75px'}} onClick={() => editAssetMakeModel()}>Update</AddButton>
+                </Box>
+                <Box sx={{marginTop: '10px'}}>
+                  <CancelButton sx={{width: '360px', height: '75px'}} onClick={() => handleCloseSetMakeModel()}>Cancel</CancelButton>
                 </Box>
               </Box>
           </Box>

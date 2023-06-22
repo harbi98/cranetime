@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import '../../Style.css';
-import { Box, Typography, Button, Modal, TextField, IconButton, Autocomplete, Tab, Tabs } from '@mui/material';
+import { Box, Typography, Button, Modal, TextField, IconButton, Autocomplete, Tab, Tabs, Checkbox } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -187,7 +187,59 @@ const AntTab = styled((props) => <Tab disableRipple {...props} />)(({ theme }) =
     fontWeight: theme.typography.fontWeightMedium,
   },
 }));
-const style = {
+const BpIcon = styled("span")(() => ({
+  borderRadius: 3,
+  width: '32px',
+  height: '32px',
+  boxShadow: "0 0 0 1px rgb(16 22 26 / 40%)",
+  backgroundColor: "#ffffff",
+  ".Mui-focusVisible &": {
+    outline: "2px auto rgba(19,124,189,.6)",
+    outlineOffset: 2
+  },
+  "input:hover ~ &": {
+    backgroundColor: "#ebf1f5"
+  },
+  "input:disabled ~ &": {
+    boxShadow: "none",
+    background: "rgba(206,217,224,.5)"
+  }
+}));
+const BpCheckedIcon = styled(BpIcon)({
+  backgroundColor: "#ffffff",
+  backgroundImage:
+    "linear-gradient(180deg,hsla(0,0%,100%,.1),hsla(0,0%,100%,0))",
+  "&:before": {
+    display: "block",
+    width: '32px',
+    height: '32px',
+    backgroundImage: `url(${require("../../icons/check.png")})`,
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'center',
+    backgroundSize: '70%',
+    filter: 'invert(27%) sepia(66%) saturate(7495%) hue-rotate(194deg) brightness(98%) contrast(88%)',
+    content: '""'
+  },
+  "input:hover ~ &": {
+    backgroundColor: "#ffffff"
+  }
+});
+function BpCheckbox(props) {
+  return (
+    <Checkbox
+      sx={{
+        "&:hover": { bgcolor: "transparent" }
+      }}
+      disableRipple
+      color="default"
+      checkedIcon={<BpCheckedIcon />}
+      icon={<BpIcon />}
+      inputProps={{ "aria-label": "Checkbox demo" }}
+      {...props}
+    />
+  );
+}
+const modal_style = {
   position: 'absolute',
   top: '50%',
   left: '50%',
@@ -318,15 +370,24 @@ function TowerCrane() {
 
   const [openSetName, setOpenSetName] = useState(false);
   const handleOpenSetName = () => setOpenSetName(true);
-  const handleCloseSetName = () => setOpenSetName(false);
+  const handleCloseSetName = () => {
+    setOpenSetName(false);
+    showAsset(assetID);
+  }
 
   const [openSetType, setOpenSetType] = useState(false);
   const handleOpenSetType = () => setOpenSetType(true);
-  const handleCloseSetType = () => setOpenSetType(false);
+  const handleCloseSetType = () => {
+    setOpenSetType(false);
+    showAsset(assetID);
+  }
 
   const [openSetMakeModel, setOpenSetMakeModel] = useState(false);
   const handleOpenSetMakeModel = () => setOpenSetMakeModel(true);
-  const handleCloseSetMakeModel = () => setOpenSetMakeModel(false);
+  const handleCloseSetMakeModel = () => {
+    setOpenSetMakeModel(false);
+    showAsset(assetID);
+  }
 
   const [openAddCustomAvailability, setOpenAddCustomAvailability] = useState(false);
   const handleOpenAddCustomAvailability = () => setOpenAddCustomAvailability(true);
@@ -377,7 +438,7 @@ function TowerCrane() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.get('http://127.0.0.1:8000/api/assets/bays', {
+      axios.get('http://127.0.0.1:8000/api/assets/bay', {
         headers: headers
       })
       .then((res) => {
@@ -393,7 +454,7 @@ function TowerCrane() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.get('http://127.0.0.1:8000/api/assets/loading_platform', {
+      axios.get('http://127.0.0.1:8000/api/assets/platform', {
         headers: headers
       })
       .then((res) => {
@@ -425,7 +486,7 @@ function TowerCrane() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.get('http://127.0.0.1:8000/api/assets/material_handling', {
+      axios.get('http://127.0.0.1:8000/api/assets/mhandling', {
         headers: headers
       })
       .then((res) => {
@@ -464,16 +525,16 @@ function TowerCrane() {
         setAssetID(res.data.data.id);
 
         setAssetName(res.data.data.custom_name);
-        setCustomName(res.data.data.custom_name);
+        //setCustomName(res.data.data.custom_name);
 
         setAssetEquipmentType(res.data.data.equipment_type);  
-        setEquipmentType(res.data.data.equipment_type);
+        //setEquipmentType(res.data.data.equipment_type);
 
         setAssetMake(res.data.data.make);
-        setMake(res.data.data.make);
+        //setMake(res.data.data.make);
 
         setAssetModel(res.data.data.model);
-        setModel(res.data.data.model);
+        //setModel(res.data.data.model);
 
         setAssetSupplier(res.data.data.supplier);
         
@@ -539,10 +600,23 @@ function TowerCrane() {
     }
   }
   const addAsset = () => {
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = today.getFullYear();
+    var hour = today.getHours();
+    var minutes = today.getMinutes();
+    var seconds = today.getSeconds();
+
+    today = yyyy + '-' + mm + '-' + dd + ' ' + hour + ':' + minutes + ':' + seconds;
     const data = {
+      created: today,
+      name: 1,
       custom_name: customName,
       make: make,
       model: model,
+      max_length: "-",
+      unit: "-",
       type: 'crane',
       equipment_type: equipmentType,
     };
@@ -555,13 +629,23 @@ function TowerCrane() {
         headers: headers
       })
       .then((res) => {
-        console.log(res.data.message);
+        alert(res.data.message);
+        
+        setCustomName();
+        setMake();
+        setModel();
+        setEquipmentType();
+
         handleClose();
         showAssets();
         showAsset_onLoad();
       })
-    } catch(e) {
-      console.log(e);
+      .catch((error) => {
+        if(error.response.status === 500) alert(JSON.stringify(error.response.data.message));
+        if(error.response.status === 422) alert(JSON.stringify(error.response.data.message));
+      })
+    }catch(e) {
+      //console.log(e);
     }
   };
   const addCustomAvailability = () => {
@@ -724,7 +808,7 @@ function TowerCrane() {
   }
   const editAssetName = () => {
     const data = {
-      custom_name: customName,
+      custom_name: assetName,
     };
     const headers = {
       'Content-Type': 'application/json',
@@ -746,7 +830,7 @@ function TowerCrane() {
   }
   const editAssetType = () => {
     const data = {
-      equipment_type: equipmentType,
+      equipment_type: assetEquipmentType,
     };
     const headers = {
       'Content-Type': 'application/json',
@@ -768,8 +852,8 @@ function TowerCrane() {
   }
   const editAssetMakeModel = () => {
     const data = {
-      make: make,
-      model: model
+      make: assetMake,
+      model: assetModel,
     };
     const headers = {
       'Content-Type': 'application/json',
@@ -851,7 +935,7 @@ function TowerCrane() {
             <Box sx={{ display: 'flex', width: '100%', justifyContent: 'space-between', borderBottom: 2, borderColor: '#edf2f6', padding: '30px' }}>
               <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', justifyContent: 'center'}}>
                 <p style={{fontSize: '0.875rem', color: '#889ab1', fontWeight: '300', marginBottom: '5px'}}>Supplier</p>
-                <p style={{fontSize: '1.125rem', fontWeight: '200', color: '#505e71', textOverflow: 'ellipsis', overflow: 'hidden'}}>{assetSupplier ? assetSupplier : 'N/A' }</p>
+                {assetSupplier ? <p style={{fontSize: '1.125rem', fontWeight: '200', color: '#505e71', textOverflow: 'ellipsis', overflow: 'hidden'}}>{assetSupplier}</p> : null}
               </Box>
               <Box sx={{ display: 'flex', width: '100px', borderLeft: 2, borderColor: '#edf2f6', alignItems: 'center', justifyContent: 'center'}}>
                 <IconButton>
@@ -1731,64 +1815,64 @@ function TowerCrane() {
       <Modal
         open={open}
       >
-        <Box sx={style}>
+        <Box sx={modal_style}>
           <Box sx={{display: 'flex', borderBottom: '1px solid #edf2f6', width: '100%', height: '75px', justifyContent: 'flex-end', padding: '10px'}}>
             <IconButton sx={{alignSelf: 'center'}} onClick={() => handleClose()}>
               <CloseIcon/>
             </IconButton>
           </Box>
           <Box sx={{display: 'flex', margin: '50px 20px', alignItems: 'center', flexDirection: 'column'}}>
-              <Typography>Add Crane</Typography>
-              <Box>
-                <Typography>Name</Typography>
-                <TextField sx={{width: '360px'}} onChange={(e) => setCustomName(e.target.value)}/>
+            <h3 style={{textAlign: 'center', color: '#505e71', fontWeight: '600', fontSize: '2.125rem', marginBottom: '55px'}}>Add Crane</h3>
+            <Box>
+              <p style={{color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', marginBottom: '5px'}}>Name</p>
+              <TextField sx={{width: '360px'}} value={customName} onChange={(e) => setCustomName(e.target.value)}/>
+            </Box>
+            <Box>
+              <p style={{color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', marginBottom: '5px'}}>Crane Type</p>
+              <Autocomplete
+                disablePortal
+                value={equipmentType}
+                onChange={(event, newValue) => {setEquipmentType(newValue)}}
+                //inputValue={inputValue}
+                id="controllable-states-demo"
+                options={options}
+                sx={{ width: '360px' }}
+                renderInput={(params) => <TextField {...params}/>}
+              />
+            </Box>
+            <Box>
+              <p style={{color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', marginBottom: '5px'}}>Crane Manufacturer</p>
+              <TextField sx={{width: '360px'}} value={make} onChange={(e) => setMake(e.target.value)}/>
+            </Box>
+            <Box>
+              <p style={{color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', marginBottom: '5px'}}>Model</p>
+              <TextField sx={{width: '360px'}} value={model} onChange={(e) => setModel(e.target.value)}/>
+            </Box>
+            <Box sx={{display: 'flex', marginTop: '50px', flexDirection: 'column'}}>
+              <Box sx={{marginTop: '10px'}}>
+                <AddButton sx={{width: '360px', height: '75px'}} onClick={() => addAsset()}>Add</AddButton>
               </Box>
-              <Box>
-                <Typography>Crane Type</Typography>
-                <Autocomplete
-                  disablePortal
-                  //value={value}
-                  onChange={(event, newValue) => {setEquipmentType(newValue)}}
-                  //inputValue={inputValue}
-                  id="controllable-states-demo"
-                  options={options}
-                  sx={{ width: '360px' }}
-                  renderInput={(params) => <TextField {...params}/>}
-                />
+              <Box sx={{marginTop: '10px'}}>
+                <CancelButton sx={{width: '360px', height: '75px'}} onClick={() => handleClose()}>Cancel</CancelButton>
               </Box>
-              <Box>
-                <Typography>Crane Manufacturer</Typography>
-                <TextField sx={{width: '360px'}} onChange={(e) => setMake(e.target.value)}/>
-              </Box>
-              <Box>
-                <Typography>Model</Typography>
-                <TextField sx={{width: '360px'}} onChange={(e) => setModel(e.target.value)}/>
-              </Box>
-              <Box sx={{display: 'flex', marginTop: '50px', flexDirection: 'column'}}>
-                <Box sx={{marginTop: '10px'}}>
-                  <AddButton sx={{width: '360px', height: '75px'}} onClick={() => addAsset()}>Add</AddButton>
-                </Box>
-                <Box sx={{marginTop: '10px'}}>
-                  <CancelButton sx={{width: '360px', height: '75px'}} onClick={() => handleClose()}>Cancel</CancelButton>
-                </Box>
-              </Box>
+            </Box>
           </Box>
         </Box>
       </Modal>
       <Modal
         open={openSetName}
       >
-        <Box sx={style}>
+        <Box sx={modal_style}>
           <Box sx={{display: 'flex', borderBottom: '1px solid #edf2f6', width: '100%', height: '75px', justifyContent: 'flex-end', padding: '10px'}}>
             <IconButton sx={{alignSelf: 'center'}} onClick={() => handleCloseSetName()}>
               <CloseIcon/>
             </IconButton>
           </Box>
           <Box sx={{display: 'flex', margin: '50px 20px', alignItems: 'center', flexDirection: 'column'}}>
-              <Typography>Set Crane Name</Typography>
-              <Box>
-                <Typography>Name</Typography>
-                <TextField sx={{width: '360px'}} value={customName} onChange={(e) => setCustomName(e.target.value)}/>
+              <h3 style={{textAlign: 'center', color: '#505e71', fontWeight: '600', fontSize: '2.125rem', marginBottom: '55px'}}>Set Crane Name</h3>
+              <Box >
+                <p style={{color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', marginBottom: '5px'}}>Name</p>
+                <TextField sx={{width: '360px'}} value={assetName} onChange={(e) => setAssetName(e.target.value)}/>
               </Box>
               <Box sx={{display: 'flex', marginTop: '50px', flexDirection: 'column'}}>
                 <Box sx={{marginTop: '10px'}}>
@@ -1804,74 +1888,74 @@ function TowerCrane() {
       <Modal
         open={openSetType}
       >
-        <Box sx={style}>
+        <Box sx={modal_style}>
           <Box sx={{display: 'flex', borderBottom: '1px solid #edf2f6', width: '100%', height: '75px', justifyContent: 'flex-end', padding: '10px'}}>
             <IconButton sx={{alignSelf: 'center'}} onClick={() => handleCloseSetType()}>
               <CloseIcon/>
             </IconButton>
           </Box>
           <Box sx={{display: 'flex', margin: '50px 20px', alignItems: 'center', flexDirection: 'column'}}>
-              <Typography>Set Crane Type</Typography>
-              <Box>
-                <Typography>Type</Typography>
-                <Autocomplete
-                  disablePortal
-                  value={equipmentType}
-                  onChange={(event, newValue) => {setEquipmentType(newValue)}}
-                  //inputValue={inputValue}
-                  id="controllable-states-demo"
-                  options={options}
-                  sx={{ width: '360px' }}
-                  renderInput={(params) => <TextField {...params} placeholder='Select...'/>}
-                />
+            <h3 style={{textAlign: 'center', color: '#505e71', fontWeight: '600', fontSize: '2.125rem', marginBottom: '55px'}}>Set Crane Type</h3>
+            <Box>
+              <p style={{color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', marginBottom: '5px'}}>Type</p>
+              <Autocomplete
+                disablePortal
+                value={assetEquipmentType}
+                onChange={(event, newValue) => {setAssetEquipmentType(newValue)}}
+                //inputValue={inputValue}
+                id="controllable-states-demo"
+                options={options}
+                sx={{ width: '360px' }}
+                renderInput={(params) => <TextField {...params} placeholder='Select...'/>}
+              />
+            </Box>
+            <Box sx={{display: 'flex', marginTop: '50px', flexDirection: 'column'}}>
+              <Box sx={{marginTop: '10px'}}>
+                <AddButton sx={{width: '360px', height: '75px'}} onClick={() => editAssetType()}>Update</AddButton>
               </Box>
-              <Box sx={{display: 'flex', marginTop: '50px', flexDirection: 'column'}}>
-                <Box sx={{marginTop: '10px'}}>
-                  <AddButton sx={{width: '360px', height: '75px'}} onClick={() => editAssetType()}>Update</AddButton>
-                </Box>
-                <Box sx={{marginTop: '10px'}}>
-                  <CancelButton sx={{width: '360px', height: '75px'}} onClick={() => handleCloseSetType()}>Cancel</CancelButton>
-                </Box>
+              <Box sx={{marginTop: '10px'}}>
+                <CancelButton sx={{width: '360px', height: '75px'}} onClick={() => handleCloseSetType()}>Cancel</CancelButton>
               </Box>
+            </Box>
           </Box>
         </Box>
       </Modal>
       <Modal
         open={openSetMakeModel}
       >
-        <Box sx={style}>
+        <Box sx={modal_style}>
           <Box sx={{display: 'flex', borderBottom: '1px solid #edf2f6', width: '100%', height: '75px', justifyContent: 'flex-end', padding: '10px'}}>
             <IconButton sx={{alignSelf: 'center'}} onClick={() => handleCloseSetMakeModel()}>
               <CloseIcon/>
             </IconButton>
           </Box>
           <Box sx={{display: 'flex', margin: '50px 20px', alignItems: 'center', flexDirection: 'column'}}>
-              <Typography>Set Make & Model</Typography>
+            <h3 style={{textAlign: 'center', color: '#505e71', fontWeight: '600', fontSize: '2.125rem', marginBottom: '55px'}}>Set Make & Model</h3>
+            <Box>
               <Box>
-                <Box>
-                  <Typography>Crane Manufacturer</Typography>
-                  <TextField sx={{width: '360px'}} value={make} onChange={(e) => setMake(e.target.value)}/>
-                </Box>
-                <Box>
-                  <Typography>Model</Typography>
-                  <TextField sx={{width: '360px'}} value={model} onChange={(e) => setModel(e.target.value)}/>
-                </Box>
+                <p style={{color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', marginBottom: '5px'}}>Crane Manufacturer</p>
+                <TextField sx={{width: '360px'}} value={assetMake} onChange={(e) => setAssetMake(e.target.value)}/>
               </Box>
-              <Box sx={{display: 'flex', marginTop: '50px', flexDirection: 'column'}}>
-                <Box sx={{marginTop: '10px'}}>
-                  <AddButton sx={{width: '360px', height: '75px'}} onClick={() => editAssetMakeModel()}>Update</AddButton>
-                </Box>
-                <Box sx={{marginTop: '10px'}}>
-                  <CancelButton sx={{width: '360px', height: '75px'}} onClick={() => handleCloseSetMakeModel()}>Cancel</CancelButton>
-                </Box>
+              <Box>
+                <p style={{color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', marginBottom: '5px'}}>Model</p>
+                <TextField sx={{width: '360px'}} value={assetModel} onChange={(e) => setAssetModel(e.target.value)}/>
               </Box>
+            </Box>
+            <Box sx={{display: 'flex', marginTop: '50px', flexDirection: 'column'}}>
+              <Box sx={{marginTop: '10px'}}>
+                <AddButton sx={{width: '360px', height: '75px'}} onClick={() => editAssetMakeModel()}>Update</AddButton>
+              </Box>
+              <Box sx={{marginTop: '10px'}}>
+                <CancelButton sx={{width: '360px', height: '75px'}} onClick={() => handleCloseSetMakeModel()}>Cancel</CancelButton>
+              </Box>
+            </Box>
           </Box>
         </Box>
       </Modal>
       <Modal
         open={openAddCustomAvailability}
       >
-        <Box sx={style}>
+        <Box sx={modal_style}>
           <Box sx={{display: 'flex', borderBottom: '1px solid #edf2f6', width: '100%', height: '75px', justifyContent: 'flex-end', padding: '10px'}}>
             <IconButton sx={{alignSelf: 'center'}} onClick={() => handleCloseAddCustomAvailability()}>
               <CloseIcon/>
@@ -1931,12 +2015,16 @@ function TowerCrane() {
                     </Box>
                     <Box sx={{display: 'flex', minHeight: '60px', margin: '0 0 10px'}}>
                       <Box sx={{display: 'flex', alignItems: 'center', width: '210px', minWidth: '210px', margin: '0 5px 0 0'}}>
-                        <input
+                        <BpCheckbox
+                          checked={customDays[0][0] ? true : false}
+                          onChange={(e) => handleChangeCustomDays(0, e)}
+                        />
+                        {/* <input
                           style={{width: '32px', height: '32px'}}
                           type="checkbox"
                           checked={customDays[0][0] ? true : false}
                           onChange={(e) => handleChangeCustomDays(0, e)}
-                        />
+                        /> */}
                         <span style={{fontSize: '1.125rem', color: '#8796aa', paddingLeft: '18px'}}>Monday</span>
                       </Box>
                       <Box sx={{position: 'relative', display: 'flex', alignItems: 'center', flex: 1, margin: '0 0 0 5px'}}>
@@ -1990,9 +2078,7 @@ function TowerCrane() {
                     </Box>
                     <Box sx={{display: 'flex', minHeight: '60px', margin: '0 0 10px'}}>
                       <Box sx={{display: 'flex', alignItems: 'center', width: '210px', minWidth: '210px', margin: '0 5px 0 0'}}>
-                        <input
-                          style={{width: '32px', height: '32px'}}
-                          type="checkbox"
+                        <BpCheckbox
                           checked={customDays[1][0] ? true : false}
                           onChange={(e) => handleChangeCustomDays(1, e)}
                         />
@@ -2049,9 +2135,7 @@ function TowerCrane() {
                     </Box>
                     <Box sx={{display: 'flex', minHeight: '60px', margin: '0 0 10px'}}>
                       <Box sx={{display: 'flex', alignItems: 'center', width: '210px', minWidth: '210px', margin: '0 5px 0 0'}}>
-                        <input
-                          style={{width: '32px', height: '32px'}}
-                          type="checkbox"
+                        <BpCheckbox
                           checked={customDays[2][0] ? true : false}
                           onChange={(e) => handleChangeCustomDays(2, e)}
                         />
@@ -2108,9 +2192,7 @@ function TowerCrane() {
                     </Box>
                     <Box sx={{display: 'flex', minHeight: '60px', margin: '0 0 10px'}}>
                       <Box sx={{display: 'flex', alignItems: 'center', width: '210px', minWidth: '210px', margin: '0 5px 0 0'}}>
-                        <input
-                          style={{width: '32px', height: '32px'}}
-                          type="checkbox"
+                        <BpCheckbox
                           checked={customDays[3][0] ? true : false}
                           onChange={(e) => handleChangeCustomDays(3, e)}
                         />
@@ -2167,9 +2249,7 @@ function TowerCrane() {
                     </Box>
                     <Box sx={{display: 'flex', minHeight: '60px', margin: '0 0 10px'}}>
                       <Box sx={{display: 'flex', alignItems: 'center', width: '210px', minWidth: '210px', margin: '0 5px 0 0'}}>
-                        <input
-                          style={{width: '32px', height: '32px'}}
-                          type="checkbox"
+                        <BpCheckbox
                           checked={customDays[4][0] ? true : false}
                           onChange={(e) => handleChangeCustomDays(4, e)}
                         />
@@ -2227,9 +2307,7 @@ function TowerCrane() {
                     </Box>
                     <Box sx={{display: 'flex', minHeight: '60px', margin: '0 0 10px'}}>
                       <Box sx={{display: 'flex', alignItems: 'center', width: '210px', minWidth: '210px', margin: '0 5px 0 0'}}>
-                        <input
-                          style={{width: '32px', height: '32px'}}
-                          type="checkbox"
+                        <BpCheckbox
                           checked={customDays[5][0] ? true : false}
                           onChange={(e) => handleChangeCustomDays(5, e)}
                         />
@@ -2287,9 +2365,7 @@ function TowerCrane() {
                     </Box>
                     <Box sx={{display: 'flex', minHeight: '60px', margin: '0 0 10px'}}>
                       <Box sx={{display: 'flex', alignItems: 'center', width: '210px', minWidth: '210px', margin: '0 5px 0 0'}}>
-                        <input
-                          style={{width: '32px', height: '32px'}}
-                          type="checkbox"
+                        <BpCheckbox
                           checked={customDays[6][0] ? true : false}
                           onChange={(e) => handleChangeCustomDays(6, e)}
                         />
@@ -2359,7 +2435,7 @@ function TowerCrane() {
       <Modal
         open={openAddBreaktime}
       >
-        <Box sx={style}>
+        <Box sx={modal_style}>
           <Box sx={{display: 'flex', borderBottom: '1px solid #edf2f6', width: '100%', height: '75px', justifyContent: 'flex-end', padding: '10px'}}>
             <IconButton sx={{alignSelf: 'center'}} onClick={() => handleCloseAddBreaktime()}>
               <CloseIcon/>

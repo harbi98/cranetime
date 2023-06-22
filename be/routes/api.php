@@ -19,6 +19,7 @@ Route::middleware('auth:api')->group( function () {
     Route::put('asset/{id}/edit-name', [AssetController::class, 'updateName']);
     Route::put('asset/{id}/edit-type', [AssetController::class, 'updateType']);
     Route::put('asset/{id}/edit-make-model', [AssetController::class, 'updateMakeModel']);
+    Route::put('asset/{id}/edit-max_length-unit', [AssetController::class, 'updateMaxLengthUnit']);
     Route::delete('assets/{id}/delete', [AssetController::class, 'destroy']);
 
     // assets availability

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class HoursCustomDates extends Model
 {
     use HasFactory;
-
+    public $timestamps = false;
     protected $table = 'hours_custom_dates';
 
     protected $fillable = [

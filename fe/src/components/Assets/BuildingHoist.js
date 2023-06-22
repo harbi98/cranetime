@@ -309,7 +309,10 @@ function BuildingHoist() {
 
   const [openSetName, setOpenSetName] = useState(false);
   const handleOpenSetName = () => setOpenSetName(true);
-  const handleCloseSetName = () => setOpenSetName(false);
+  const handleCloseSetName = () => {
+    setOpenSetName(false);
+    showAsset(assetID);
+  }
 
   const [openAddCustomAvailability, setOpenAddCustomAvailability] = useState(false);
   const handleOpenAddCustomAvailability = () => setOpenAddCustomAvailability(true);
@@ -360,7 +363,7 @@ function BuildingHoist() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.get('http://127.0.0.1:8000/api/assets/bays', {
+      axios.get('http://127.0.0.1:8000/api/assets/bay', {
         headers: headers
       })
       .then((res) => {
@@ -376,7 +379,7 @@ function BuildingHoist() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.get('http://127.0.0.1:8000/api/assets/loading_platform', {
+      axios.get('http://127.0.0.1:8000/api/assets/platform', {
         headers: headers
       })
       .then((res) => {
@@ -408,7 +411,7 @@ function BuildingHoist() {
       'Authorization': `Bearer ${localStorage.getItem('token')}`,
     };
     try {
-      axios.get('http://127.0.0.1:8000/api/assets/material_handling', {
+      axios.get('http://127.0.0.1:8000/api/assets/mhandling', {
         headers: headers
       })
       .then((res) => {
@@ -447,7 +450,7 @@ function BuildingHoist() {
         setAssetID(res.data.data.id);
 
         setAssetName(res.data.data.custom_name);
-        setCustomName(res.data.data.custom_name);
+        //setCustomName(res.data.data.custom_name);
 
         setTabIndex("1");
       })
@@ -502,8 +505,23 @@ function BuildingHoist() {
     }
   }
   const addAsset = () => {
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = today.getFullYear();
+    var hour = today.getHours();
+    var minutes = today.getMinutes();
+    var seconds = today.getSeconds();
+
+    today = yyyy + '-' + mm + '-' + dd + ' ' + hour + ':' + minutes + ':' + seconds;
     const data = {
+      created: today,
+      name: 1,
       custom_name: customName,
+      make: "N/A",
+      model: "N/A",
+      max_length: "-",
+      unit: "-",
       type: 'hoist',
     };
     const headers = {
@@ -515,10 +533,17 @@ function BuildingHoist() {
         headers: headers
       })
       .then((res) => {
-        console.log(res.data.message);
+        alert(res.data.message);
+
+        setCustomName();
+
         handleClose();
         showAssets();
         showAsset_onLoad();
+      })
+      .catch((error) => {
+        if(error.response.status === 500) alert(JSON.stringify(error.response.data.message));
+        if(error.response.status === 422) alert(JSON.stringify(error.response.data.message));
       })
     } catch(e) {
       console.log(e);
@@ -526,7 +551,7 @@ function BuildingHoist() {
   }
   const editAssetName = () => {
     const data = {
-      custom_name: customName,
+      custom_name: assetName,
     };
     const headers = {
       'Content-Type': 'application/json',
@@ -1181,7 +1206,7 @@ function BuildingHoist() {
               }
             </div>
             <Box display="flex" justifyContent="center" alignItems="center" sx={{position: 'fixed', bottom: 0, height: '100px', width: 415, padding: '15px 20px', borderTop: 2, borderTopColor: '#edf2f6'}}>
-              <AddButton sx={{width: '100%', height: '100%'}} onClick={() => handleOpen()}>Add Building Hoist</AddButton>
+              <AddButton sx={{width: '100%', height: '100%'}} onClick={() => handleOpen()}>Add Hoist</AddButton>
             </Box>
           </Box>
         </Box>
@@ -1397,15 +1422,15 @@ function BuildingHoist() {
       >
         <Box sx={style}>
           <Box borderBottom={2} borderColor='#e0e0e0' sx={{display: 'flex', width: '100%', height: '75px', justifyContent: 'flex-end', padding: '10px'}}>
-            <IconButton onClick={() => handleClose()}>
+            <IconButton sx={{alignSelf: 'center'}} onClick={() => handleClose()}>
               <CloseIcon/>
             </IconButton>
           </Box>
           <Box sx={{display: 'flex', margin: '50px 20px', alignItems: 'center', flexDirection: 'column'}}>
-              <Typography>Add Hoist</Typography>
+              <h3 style={{textAlign: 'center', color: '#505e71', fontWeight: '600', fontSize: '2.125rem', marginBottom: '55px'}}>Add Hoist</h3>
               <Box>
-                <Typography>Name</Typography>
-                <TextField sx={{width: '360px'}} onChange={(e) => setCustomName(e.target.value)}/>
+                <p style={{color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', marginBottom: '5px'}}>Name</p>
+                <TextField sx={{width: '360px'}} value={customName} onChange={(e) => setCustomName(e.target.value)}/>
               </Box>
               <Box sx={{display: 'flex', marginTop: '50px', flexDirection: 'column'}}>
                 <Box sx={{marginTop: '10px'}}>
@@ -1423,15 +1448,15 @@ function BuildingHoist() {
       >
         <Box sx={style}>
           <Box borderBottom={2} borderColor='#e0e0e0' sx={{display: 'flex', width: '100%', height: '75px', justifyContent: 'flex-end', padding: '10px'}}>
-            <IconButton onClick={() => handleCloseSetName()}>
+            <IconButton sx={{alignSelf: 'center'}} onClick={() => handleCloseSetName()}>
               <CloseIcon/>
             </IconButton>
           </Box>
           <Box sx={{display: 'flex', margin: '50px 20px', alignItems: 'center', flexDirection: 'column'}}>
-              <Typography>Set Building Hoist Name</Typography>
+              <h3 style={{textAlign: 'center', color: '#505e71', fontWeight: '600', fontSize: '2.125rem', marginBottom: '55px'}}>Set Hoist Name</h3>
               <Box>
-                <Typography>Name</Typography>
-                <TextField sx={{width: '360px'}} value={customName} onChange={(e) => setCustomName(e.target.value)}/>
+                <p style={{color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', marginBottom: '5px'}}>Name</p>
+                <TextField sx={{width: '360px'}} value={assetName} onChange={(e) => setAssetName(e.target.value)}/>
               </Box>
               <Box sx={{display: 'flex', marginTop: '50px', flexDirection: 'column'}}>
                 <Box sx={{marginTop: '10px'}}>
