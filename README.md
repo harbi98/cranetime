@@ -2,6 +2,7 @@ Requirements
 1. node v18.16.0
 2. php v8.2.4
 3. Composer v2.5.5
+4. Cranetime V2 Database
 
 Cranetime
  - Back End using Laravel 9
