@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import AuthContext from '../context/AuthContext';
 import '../App.min.css';
-import { Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, Link, IconButton, Button, TextField } from '@mui/material';
+import { Drawer, List, ListItem, ListItemButton, ListItemIcon, Link, IconButton, Button, TextField } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import MailIcon from '@mui/icons-material/EmailOutlined';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -93,7 +93,7 @@ function Home() {
   const [showSitePicker, setShowSitePicker] = useState(false);
   const drawerWidth = 70;
   return (
-    <Box className="container">
+    <div className="container">
       <Drawer
         PaperProps={{
           sx: {
@@ -114,12 +114,12 @@ function Home() {
         variant="permanent"
         anchor="left"
       >
-        <Box className="navbar-top">
-          <Box className='navbar-header'>
+        <div className="navbar-top">
+          <div className='navbar-header'>
             <Link className="navbar-logo" href="/">
               <img src={require("../images/logo.png")} alt="Logo"/>
             </Link>
-          </Box>
+          </div>
           <List disablePadding>
             <ListItem disablePadding>
               <ListItemButton sx={{height: 70, borderBottom: '1px solid #0161aa', padding: '0', justifyContent: 'center'}} onClick={() => setShowSitePicker(!showSitePicker)}>
@@ -157,8 +157,8 @@ function Home() {
               </ListItemButton>
             </ListItem>
           </List>
-        </Box>
-        <Box className="navbar-bottom">
+        </div>
+        <div className="navbar-bottom">
           <List disablePadding>
             <ListItem disablePadding>
               <ListItemButton sx={{height: 70, borderTop: '1px solid #0161aa', padding: '0', justifyContent: 'center'}} onClick={() => logoutUser()}>
@@ -175,7 +175,7 @@ function Home() {
               </ListItemButton>
             </ListItem>
           </List>
-        </Box>
+        </div>
       </Drawer>
       {showSitePicker ?
           <div style={{
@@ -249,7 +249,7 @@ function Home() {
           null
       }
       {home_main}
-    </Box>
+    </div>
   );
 }
 

@@ -13,14 +13,17 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'created' => 'required',
+            //'created' => 'required',,
             'email' => 'required|email',
             'phone' => 'required',
             'phone_code' => 'required',
-            'name_first' => 'required',
-            'name_last' => 'required',
             'password' => 'required',
             'c_password' => 'required|same:password',
+            //'image' => 'required',
+            'name_first' => 'required',
+            'name_last' => 'required',
+            //'admin_access' => 'required',
+
         ]);
    
         if($validator->fails()){
@@ -30,11 +33,9 @@ class AuthController extends Controller
             ], 422);    
         } else {
             $user = User::create([
-                'actioner_id' => 1900,
-                'created' => $request->created,
                 'status' => 1,
                 'logged_in' => 0,
-                'verified' => 1,
+                'verified' => 0,
                 'email' => $request->email,
                 'phone' => $request->phone,
                 'phone_code' => $request->phone_code,

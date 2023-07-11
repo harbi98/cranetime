@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import '../../Style.css';
-import {Modal, Box, IconButton, Button, Checkbox} from '@mui/material';
+import {Modal, Box, IconButton, Button, Checkbox, TextField} from '@mui/material';
 import { styled } from '@mui/material/styles';
 import EditIcon from '@mui/icons-material/Edit';
 import GoogleMapReact from 'google-map-react';
@@ -161,6 +161,10 @@ function SettingsSite() {
   const [openSetType, setOpenSetType] = useState(false);
   const handleOpenSetType = () => setOpenSetType(true);
   const handleCloseSetType = () => setOpenSetType(false);
+
+  const [openProjectCost, setOpenProjectCost] = useState(false);
+  const handleOpenProjectCost = () => setOpenProjectCost(true);
+  const handleCloseProjectCost = () => setOpenProjectCost(false);
   return (
     <>
       <div className='settings-site tabs__section'>
@@ -313,7 +317,7 @@ function SettingsSite() {
                           <p className="text__middle">$3.2bn AUD</p>
                         </div>
                       </div>
-                      <IconButton sx={{alignSelf: 'center', alignItems: 'center', justifyContent: 'center', marginLeft: '30px'}} onClick={() => alert('pressed')}>
+                      <IconButton sx={{alignSelf: 'center', alignItems: 'center', justifyContent: 'center', marginLeft: '30px'}} onClick={() =>  handleOpenProjectCost()}>
                         <EditIcon/>
                       </IconButton>
                     </div>
@@ -411,6 +415,39 @@ function SettingsSite() {
                 </Box>
                 <Box sx={{marginTop: '10px'}}>
                   <CancelButton sx={{width: '100%', height: '75px'}} onClick={() => handleCloseSetType()}>Cancel</CancelButton>
+                </Box>
+              </div>
+          </Box>
+        </Box>
+      </Modal>
+      <Modal
+        open={openProjectCost}
+      >
+        <Box sx={modal_style}>
+          <Box sx={{display: 'flex', borderBottom: '1px solid #edf2f6', width: '100%', height: '75px', justifyContent: 'flex-end', padding: '10px'}}>
+            <IconButton sx={{alignSelf: 'center'}} onClick={() => handleCloseProjectCost()}>
+              <CloseIcon/>
+            </IconButton>
+          </Box>
+          <Box sx={{display: 'block', margin: '50px 20px', alignItems: 'center', justifyContent: 'center', flexDirection: 'column'}}>
+              <h3 style={{textAlign: 'center', color: '#505e71', fontWeight: '600', fontSize: '2.125rem', marginBottom: '55px'}}>Set Projected Cost</h3>
+              <div style={{ display: 'block', maxWidth: '380px', margin: '0 auto' }}>
+                <div>
+                  <p style={{color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', marginBottom: '5px'}}>Currency</p>
+                  <TextField sx={{width: '360px'}}/>
+                </div>
+                <div style={{marginTop: '15px'}}>
+                  <p style={{color: '#889ab1', fontWeight: '300', fontSize: '0.875rem', marginBottom: '5px'}}>Projected Cost</p>
+                  <TextField sx={{width: '360px'}}/>
+                  <TextField sx={{width: '360px'}}/>
+                </div>
+              </div>
+              <div style={{ display: 'block', maxWidth: '380px', margin: '70px auto 0' }}>
+                <Box sx={{marginTop: '10px'}}>
+                  <AddButton sx={{width: '100%', height: '75px'}}>Update</AddButton>
+                </Box>
+                <Box sx={{marginTop: '10px'}}>
+                  <CancelButton sx={{width: '100%', height: '75px'}} onClick={() => handleCloseProjectCost()}>Cancel</CancelButton>
                 </Box>
               </div>
           </Box>

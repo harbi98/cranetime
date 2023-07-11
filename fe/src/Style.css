@@ -50,7 +50,7 @@
     box-sizing: border-box;
 }
 a, button, input, select, textarea {
-    outline: 0;
+    outline: 0
 }
 form {
     display: block;
@@ -456,6 +456,24 @@ ul {
     width: 460px;
     box-shadow: 3px 0 7px rgba(103,162,206,.2);
 }
+@media screen and (max-width:767px) {
+    .settings-sidebar {
+        min-width: auto;
+        width: 100%
+    }
+}
+
+.settings-sidebar_small {
+    min-width: 410px;
+    width: 410px
+}
+
+@media screen and (max-width:767px) {
+    .settings-sidebar_small {
+        min-width: auto;
+        width: 100%
+    }
+}
 .settings__content {
     height: calc(100% - 65px);
 }
@@ -485,6 +503,20 @@ ul {
     padding: 30px;
     border-bottom: 1px solid var(--border-color);
 }
+.settings-about__logo {
+    position: relative;
+    margin-bottom: 30px
+}
+
+.settings-about__logo img {
+    border-radius: 3px
+}
+
+.settings-about__logo .btn__edit {
+    position: absolute;
+    bottom: 50px;
+    right: 50px
+}
 .settings-about__icon {
     min-height: 215px;
     border-radius: 3px;
@@ -501,6 +533,32 @@ ul {
     justify-content: center;
     text-align: center;
 }
+.settings-sidebar__buttons {
+    display: flex;
+    border-bottom: 1px solid var(--border-color)
+}
+.settings-sidebar__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50%;
+    height: 60px;
+    border-right: 1px solid var(--border-color);
+    transition: all .3s;
+}
+
+.settings-sidebar__btn:hover {
+    background-color: var(--primary-color)
+}
+
+.settings-sidebar__btn:last-child {
+    border-right: none
+}
+
+.settings-sidebar__btn svg {
+    stroke: #8897aa;
+    transition: all .3s
+}
 .settings__title {
     color: var(--font-color-dark);
     font-weight: 300;
@@ -510,11 +568,32 @@ ul {
 .settings__title:last-child {
     margin-bottom: 0;
 }
+.settings-search__elem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border-color);
+    min-height: 95px;
+    padding: 20px 40px;
+    cursor: pointer;
+    transition: all .3s
+}
+.settings-search__elem:hover {
+    background-color: var(--primary-color)
+}
+
+.settings-search__elem .text__middle {
+    transition: all .3s
+}
 .header__titles {
     display: flex;
     justify-content: space-between;
     padding: 15px 20px;
     border-bottom: 1px solid var(--border-color);
+}
+.header__titles_red {
+    background-color: var(--red-color);
+    border-bottom-color: var(--red-color-dark)
 }
 .header-profile {
     position: relative;
@@ -543,12 +622,6 @@ ul {
     padding-bottom: 100px;
 }
 .settings-search__block {
-    border-bottom: 1px solid var(--border-color);
-}
-.header__titles {
-    display: flex;
-    justify-content: space-between;
-    padding: 15px 20px;
     border-bottom: 1px solid var(--border-color);
 }
 .text__small {
@@ -696,6 +769,10 @@ ul {
     overflow: hidden;
     background-color: var(--font-color-lightest);
     box-shadow: 3px 3px 7px var(--shadow-color);
+}
+.svg_search {
+    width: 20px;
+    height: 20px
 }
 .settings-sidebar__img .btn__edit {
     position: absolute;

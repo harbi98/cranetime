@@ -1390,7 +1390,7 @@ function BuildingHoist() {
       >
         <Box sx={style}>
           <Box borderBottom={2} borderColor='#e0e0e0' sx={{display: 'flex', width: '100%', height: '75px', justifyContent: 'flex-end', padding: '10px'}}>
-            <IconButton onClick={() => handleClose()}>
+            <IconButton sx={{alignSelf: 'center'}} onClick={() => handleClose()}>
               <CloseIcon/>
             </IconButton>
           </Box>
@@ -1416,7 +1416,7 @@ function BuildingHoist() {
       >
         <Box sx={style}>
           <Box borderBottom={2} borderColor='#e0e0e0' sx={{display: 'flex', width: '100%', height: '75px', justifyContent: 'flex-end', padding: '10px'}}>
-            <IconButton onClick={() => handleCloseSetName()}>
+            <IconButton sx={{alignSelf: 'center'}} onClick={() => handleCloseSetName()}>
               <CloseIcon/>
             </IconButton>
           </Box>

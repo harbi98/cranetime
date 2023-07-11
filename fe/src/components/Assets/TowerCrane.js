@@ -249,8 +249,7 @@ const modal_style = {
   backgroundColor: 'white',
   paddingBottom: '50px'
   //overflowY: 'scroll'
-};
-
+}
 function TowerCrane() {
   const [tabIndex, setTabIndex] = useState("1");
   const handleChange = (event, newValue) => {
@@ -1039,10 +1038,7 @@ function TowerCrane() {
                   <span style={{padding: '0 20px 0 0', fontWeight: '300', fontSize: '1.125rem', color: '#505e71'}}>
                     Reachable
                   </span>
-                  <input
-                    style={{width: '32px', height: '32px', margin: 'auto'}}
-                    type="checkbox"
-                  />
+                  <BpCheckbox/>
                 </div> 
               </div>
               <div style={{padding: '0 30px 30px'}}>
@@ -1109,10 +1105,7 @@ function TowerCrane() {
                   <span style={{padding: '0 20px 0 0', fontWeight: '300', fontSize: '1.125rem', color: '#505e71'}}>
                     Reachable
                   </span>
-                  <input
-                    style={{width: '32px', height: '32px', margin: 'auto'}}
-                    type="checkbox"
-                  />
+                  <BpCheckbox/>
                 </div> 
               </div>
               <div style={{padding: '0 30px 30px'}}>
@@ -1179,10 +1172,7 @@ function TowerCrane() {
                   <span style={{padding: '0 20px 0 0', fontWeight: '300', fontSize: '1.125rem', color: '#505e71'}}>
                     Reachable
                   </span>
-                  <input
-                    style={{width: '32px', height: '32px', margin: 'auto'}}
-                    type="checkbox"
-                  />
+                  <BpCheckbox/>
                 </div> 
               </div>
               <div style={{padding: '0 30px 30px'}}>
@@ -1249,10 +1239,7 @@ function TowerCrane() {
                   <span style={{padding: '0 20px 0 0', fontWeight: '300', fontSize: '1.125rem', color: '#505e71'}}>
                     Reachable
                   </span>
-                  <input
-                    style={{width: '32px', height: '32px', margin: 'auto'}}
-                    type="checkbox"
-                  />
+                  <BpCheckbox/>
                 </div> 
               </div>
               <div style={{padding: '0 30px 30px'}}>
@@ -1319,10 +1306,7 @@ function TowerCrane() {
                   <span style={{padding: '0 20px 0 0', fontWeight: '300', fontSize: '1.125rem', color: '#505e71'}}>
                     Reachable
                   </span>
-                  <input
-                    style={{width: '32px', height: '32px', margin: 'auto'}}
-                    type="checkbox"
-                  />
+                  <BpCheckbox/>
                 </div> 
               </div>
               <div style={{padding: '0 30px 30px'}}>
@@ -1389,10 +1373,7 @@ function TowerCrane() {
                   <span style={{padding: '0 20px 0 0', fontWeight: '300', fontSize: '1.125rem', color: '#505e71'}}>
                     Reachable
                   </span>
-                  <input
-                    style={{width: '32px', height: '32px', margin: 'auto'}}
-                    type="checkbox"
-                  />
+                  <BpCheckbox/>
                 </div> 
               </div>
               <div style={{padding: '0 30px 30px'}}>

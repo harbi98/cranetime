@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import '../App.min.css';
-import { Box, Drawer, List, ListItem, ListItemButton, Divider, ListItemText, Typography } from '@mui/material';
+import { Drawer, List, ListItem, ListItemButton, Divider, ListItemText, Typography } from '@mui/material';
 import Site from './System/Site';
 import TowerCranes from './Assets/TowerCrane';
 import MobileCranes from './Assets/MobileCrane';
@@ -9,6 +9,7 @@ import LoadingPlatforms from './Assets/LoadingPlatforms';
 import BuildingHoists from './Assets/BuildingHoist';
 import MaterialHandling from './Assets/MaterialHandling';
 import ConcretePumps from './Assets/ConcretePumps';
+import Task from './Project/Task';
 
 function Settings() {
   const drawerWidth = 250;
@@ -16,6 +17,8 @@ function Settings() {
   const settings_display = (settings_dis) => {
     if(settings_dis === "Site") {
       set_settings_main(<Site/>);
+    } else if(settings_dis === "Task") {
+      set_settings_main(<Task/>);
     } else if(settings_dis === "Tower Cranes") {
       set_settings_main(<TowerCranes/>);
     } else if(settings_dis === "Mobile Cranes") {
@@ -35,7 +38,7 @@ function Settings() {
     }
   }
   return (
-    <Box className="home-main-wrap">
+    <div className="home-main-wrap">
         <Drawer
           PaperProps={{
             sx: {
@@ -49,17 +52,17 @@ function Settings() {
             flexShrink: 0,
             '& .MuiDrawer-paper': {
               width: drawerWidth,
-              boxSizing: 'border-box',
+              divSizing: 'border-div',
             },
           }}
           variant="permanent"
           anchor="left"
         >
           <Divider />
-          <Box className="settings-header">
+          <div className="settings-header">
             <Typography className="settings-title" variant="h5">Settings</Typography>
-          </Box>
-          <Box className="settings-nav-body">
+          </div>
+          <div className="settings-nav-body">
             <List
               sx={{
                 marginBottom: '20px',
@@ -143,10 +146,10 @@ function Settings() {
                 </ListItem>
               ))}
             </List>
-          </Box>
+          </div>
         </Drawer>
         {settings_main}
-      </Box>
+      </div>
   );
 }
 

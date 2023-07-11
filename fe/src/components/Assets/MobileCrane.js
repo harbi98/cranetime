@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import '../../Style.css';
-import { Box, Typography, Button, Modal, TextField, IconButton, Tab, Tabs } from '@mui/material';
+import { Box, Typography, Button, Modal, TextField, IconButton, Tab, Tabs, Checkbox } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -191,16 +191,69 @@ const AntTab = styled((props) => <Tab disableRipple {...props} />)(({ theme }) =
     fontWeight: theme.typography.fontWeightMedium,
   },
 }));
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: '100%',
-  height: '100%',
-  backgroundColor: 'white',
-};
-
+const BpIcon = styled("span")(() => ({
+  borderRadius: 3,
+  width: '32px',
+  height: '32px',
+  boxShadow: "0 0 0 1px rgb(16 22 26 / 40%)",
+  backgroundColor: "#ffffff",
+  ".Mui-focusVisible &": {
+    outline: "2px auto rgba(19,124,189,.6)",
+    outlineOffset: 2
+  },
+  "input:hover ~ &": {
+    backgroundColor: "#ebf1f5"
+  },
+  "input:disabled ~ &": {
+    boxShadow: "none",
+    background: "rgba(206,217,224,.5)"
+  }
+}));
+const BpCheckedIcon = styled(BpIcon)({
+  backgroundColor: "#ffffff",
+  backgroundImage:
+    "linear-gradient(180deg,hsla(0,0%,100%,.1),hsla(0,0%,100%,0))",
+  "&:before": {
+    display: "block",
+    width: '32px',
+    height: '32px',
+    backgroundImage: `url(${require("../../icons/check.png")})`,
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'center',
+    backgroundSize: '70%',
+    filter: 'invert(27%) sepia(66%) saturate(7495%) hue-rotate(194deg) brightness(98%) contrast(88%)',
+    content: '""'
+  },
+  "input:hover ~ &": {
+    backgroundColor: "#ffffff"
+  }
+});
+function BpCheckbox(props) {
+  return (
+    <Checkbox
+      sx={{
+        "&:hover": { bgcolor: "transparent" }
+      }}
+      disableRipple
+      color="default"
+      checkedIcon={<BpCheckedIcon />}
+      icon={<BpIcon />}
+      inputProps={{ "aria-label": "Checkbox demo" }}
+      {...props}
+    />
+  );
+}
+// modal style
+  const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'white',
+  };
+//
 function MobileCrane() {
   const [tabIndex, setTabIndex] = useState("1");
   const handleChange = (event, newValue) => {
@@ -741,10 +794,7 @@ function MobileCrane() {
                   <span style={{padding: '0 20px 0 0', fontWeight: '300', fontSize: '1.125rem', color: '#505e71'}}>
                     Reachable
                   </span>
-                  <input
-                    style={{width: '32px', height: '32px', margin: 'auto'}}
-                    type="checkbox"
-                  />
+                  <BpCheckbox/>
                 </div> 
               </div>
               <div style={{padding: '0 30px 30px'}}>
@@ -811,10 +861,7 @@ function MobileCrane() {
                   <span style={{padding: '0 20px 0 0', fontWeight: '300', fontSize: '1.125rem', color: '#505e71'}}>
                     Reachable
                   </span>
-                  <input
-                    style={{width: '32px', height: '32px', margin: 'auto'}}
-                    type="checkbox"
-                  />
+                  <BpCheckbox/>
                 </div> 
               </div>
               <div style={{padding: '0 30px 30px'}}>
@@ -881,10 +928,7 @@ function MobileCrane() {
                   <span style={{padding: '0 20px 0 0', fontWeight: '300', fontSize: '1.125rem', color: '#505e71'}}>
                     Reachable
                   </span>
-                  <input
-                    style={{width: '32px', height: '32px', margin: 'auto'}}
-                    type="checkbox"
-                  />
+                  <BpCheckbox/>
                 </div> 
               </div>
               <div style={{padding: '0 30px 30px'}}>
@@ -951,10 +995,7 @@ function MobileCrane() {
                   <span style={{padding: '0 20px 0 0', fontWeight: '300', fontSize: '1.125rem', color: '#505e71'}}>
                     Reachable
                   </span>
-                  <input
-                    style={{width: '32px', height: '32px', margin: 'auto'}}
-                    type="checkbox"
-                  />
+                  <BpCheckbox/>
                 </div> 
               </div>
               <div style={{padding: '0 30px 30px'}}>
@@ -1021,10 +1062,7 @@ function MobileCrane() {
                   <span style={{padding: '0 20px 0 0', fontWeight: '300', fontSize: '1.125rem', color: '#505e71'}}>
                     Reachable
                   </span>
-                  <input
-                    style={{width: '32px', height: '32px', margin: 'auto'}}
-                    type="checkbox"
-                  />
+                  <BpCheckbox/>
                 </div> 
               </div>
               <div style={{padding: '0 30px 30px'}}>
@@ -1091,10 +1129,7 @@ function MobileCrane() {
                   <span style={{padding: '0 20px 0 0', fontWeight: '300', fontSize: '1.125rem', color: '#505e71'}}>
                     Reachable
                   </span>
-                  <input
-                    style={{width: '32px', height: '32px', margin: 'auto'}}
-                    type="checkbox"
-                  />
+                  <BpCheckbox/>
                 </div> 
               </div>
               <div style={{padding: '0 30px 30px'}}>

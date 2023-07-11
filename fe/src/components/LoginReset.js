@@ -1,7 +1,7 @@
 import * as React from 'react';
 import '../App.min.css';
 import { styled } from '@mui/material/styles';
-import { Box, Typography, TextField, Button, Link } from '@mui/material';
+import { Typography, TextField, Button, Link } from '@mui/material';
 
 const ResetButton = styled(Button)({
   borderRadius: 3,
@@ -44,49 +44,49 @@ const ResetButton = styled(Button)({
 
 function Login() {
   return (
-    <Box className="container">
-      <Box className="login-sidebar">
-        <Box className="login-sidebar-logo">
+    <div className="container">
+      <div className="login-sidebar">
+        <div className="login-sidebar-logo">
           <Link href="/">
             <img className='login-logo' src={require("../images/logo.png")} alt="Logo"/>
           </Link>
-        </Box>
-        <Box className="login-sidebar-info">
-          <Box className="login-sidebar-title">
+        </div>
+        <div className="login-sidebar-info">
+          <div className="login-sidebar-title">
             <h1 className='login-sidebar-title'>The construction logistics platform.</h1>
             <h2 className='login-sidebar-subtitle'>Liftinig Industry Standards.</h2>
-          </Box>
-        </Box>
-        <Box className="login-sidebar-bottom">
+          </div>
+        </div>
+        <div className="login-sidebar-bottom">
           <img className='login-logo-bottom' src={require("../images/logo_bottom.png")} alt="Bottom Logo"/>
-        </Box>
-      </Box>
-      <Box className="login-main">
-        <Box className="login-inner">
-          <Box className="login-center">
+        </div>
+      </div>
+      <div className="login-main">
+        <div className="login-inner">
+          <div className="login-center">
             <Typography className="login__title text__big">Reset your password</Typography>
-            <Box className="login-feilds">
-              <Box className="form-row">
+            <div className="login-feilds">
+              <div className="form-row">
                 <Typography className="text__small">Email Address</Typography>
-                <Box className="form-group">
-                  <Box className="form-cell">
-                    <Box className="form__field">
+                <div className="form-group">
+                  <div className="form-cell">
+                    <div className="form__field">
                       <TextField type="email" name="login_email" className="input"/>
-                    </Box>
-                  </Box>
-                </Box>
-              </Box>
-            </Box>
-            <Box className="login__buttons">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="login__buttons">
                 <ResetButton variant='contained' href='/'>Reset Password</ResetButton>
-            </Box>
-          </Box>
-          <Box className="login-footer">
+            </div>
+          </div>
+          <div className="login-footer">
             <Typography className='text-small'>Cranetime © 2021</Typography>
-          </Box>
-        </Box>
-      </Box>
-    </Box>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 

@@ -289,6 +289,36 @@ html, body, #root {
   width: 100%;
   z-index: 6;
 }
+.settings__wrap {
+  display: flex;
+  width: 100%;
+}
+.settings-navbar {
+  position: relative;
+  z-index: 6;
+  background-color: #252529;
+  min-width: 250px;
+  width: 250px;
+  box-shadow: 3px 3px 7px var(--shadow-color);
+}
+.settings__site {
+  display: flex;
+  width: 100%;
+}
+.settings-search {
+  position: relative;
+  z-index: 5;
+  min-width: 415px;
+  width: 415px;
+  background-color: var(--bg-color);
+  box-shadow: 3px 3px 7px var(--shadow-color);
+}
+.settings-search__body {
+  height: calc(100% - 65px);
+}
+.settings-search__body_pb {
+  padding-bottom: 100px;
+}
 .settings-header {
   display: flex;
   align-items: center;
